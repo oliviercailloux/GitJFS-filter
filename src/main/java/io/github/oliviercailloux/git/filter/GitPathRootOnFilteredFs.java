@@ -22,10 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Similar to a GitPathRoot (which it wraps and delegates to) except linked to a
- * filteredFs.
+ * Similar to a GitPathRoot (which it wraps and delegates to) except linked to a filteredFs.
  */
-final class GitPathRootOnFilteredFs extends ForwardingGitPathRoot implements IGitPathRootOnFilteredFs {
+final class GitPathRootOnFilteredFs extends ForwardingGitPathRoot
+    implements IGitPathRootOnFilteredFs {
   @SuppressWarnings("unused")
   private static final Logger LOGGER = LoggerFactory.getLogger(GitPathRootOnFilteredFs.class);
 
@@ -130,13 +130,12 @@ final class GitPathRootOnFilteredFs extends ForwardingGitPathRoot implements IGi
     final Commit underlying = cached.getCommit();
     final ImmutableSet<ObjectId> underlyingParents = ImmutableSet.copyOf(underlying.parents());
     final Set<GitPathRootShaCached> filteredParents = fs.graph().predecessors(cached);
-    final ImmutableSet<ObjectId> filteredParentIds = filteredParents.stream().map(GitPathRootSha::getStaticCommitId)
-        .collect(ImmutableSet.toImmutableSet());
+    final ImmutableSet<ObjectId> filteredParentIds = filteredParents.stream()
+        .map(GitPathRootSha::getStaticCommitId).collect(ImmutableSet.toImmutableSet());
     if (!underlyingParents.equals(filteredParentIds)) {
-      LOGGER.warn("Commit’s filtered parents {} should replace the returned ones {}.", filteredParentIds,
-          underlyingParents);
+      LOGGER.warn("Commit’s filtered parents {} should replace the returned ones {}.",
+          filteredParentIds, underlyingParents);
     }
     return underlying;
   }
-
 }

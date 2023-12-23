@@ -13,10 +13,11 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 /**
- * Similar to a {@link GitPathRootSha} (which it wraps and delegates to) except
- * linked to a filteredFs.
+ * Similar to a {@link GitPathRootSha} (which it wraps and delegates to) except linked to a
+ * filteredFs.
  */
-final class GitPathRootShaOnFilteredFs extends ForwardingGitPathRootSha implements IGitPathRootOnFilteredFs {
+final class GitPathRootShaOnFilteredFs extends ForwardingGitPathRootSha
+    implements IGitPathRootOnFilteredFs {
 
   static GitPathRootShaOnFilteredFs wrap(GitFilteringFs fs, GitPathRootSha delegate) {
     return new GitPathRootShaOnFilteredFs(fs, delegate);
@@ -117,5 +118,4 @@ final class GitPathRootShaOnFilteredFs extends ForwardingGitPathRootSha implemen
   public GitPathOnFilteredFs toRealPath(LinkOption... options) throws IOException {
     return GitPathOnFilteredFs.wrap(fs, delegate.toRealPath(options));
   }
-
 }

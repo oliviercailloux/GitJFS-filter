@@ -38,10 +38,11 @@ public class GitFilteringFs extends ForwardingGitFileSystem {
    * Returns a file system that only shows paths that match the given filter.
    *
    * @param delegate the original file system
-   * @param filter   indicates which elements should be kept
+   * @param filter indicates which elements should be kept
    * @return a filtering file system
    */
-  public static GitFilteringFs filter(GitFileSystem delegate, TPredicate<Commit, IOException> filter) {
+  public static GitFilteringFs filter(GitFileSystem delegate,
+      TPredicate<Commit, IOException> filter) {
     return new GitFilteringFs(delegate, filter);
   }
 
@@ -87,7 +88,8 @@ public class GitFilteringFs extends ForwardingGitFileSystem {
 
   @Override
   public GitPath getAbsolutePath(ObjectId commitId, String internalPath1, String... internalPath) {
-    return GitPathOnFilteredFs.wrap(this, super.getAbsolutePath(commitId, internalPath1, internalPath));
+    return GitPathOnFilteredFs.wrap(this,
+        super.getAbsolutePath(commitId, internalPath1, internalPath));
   }
 
   @Override
@@ -103,11 +105,11 @@ public class GitFilteringFs extends ForwardingGitFileSystem {
       final MutableGraph<GitPathRootShaCached> filtered = Graphs.inducedSubgraph(closed,
           CheckedStream.<GitPathRootShaCached, IOException>wrapping(closed.nodes().stream())
               .filter(p -> filter.test(p.getCommit())).collect(ImmutableSet.toImmutableSet()));
-      final org.jgrapht.Graph<GitPathRootShaCached, EndpointPair<GitPathRootShaCached>> adapted = new MutableGraphAdapter<>(
-          filtered);
+      final org.jgrapht.Graph<GitPathRootShaCached, EndpointPair<GitPathRootShaCached>> adapted =
+          new MutableGraphAdapter<>(filtered);
       TransitiveReduction.INSTANCE.reduce(adapted);
-      final MutableGraph<GitPathRootShaCached> wrapped = GraphUtils.transform(filtered,
-          p -> GitPathRootShaCachedOnFilteredFs.wrap(this, p));
+      final MutableGraph<GitPathRootShaCached> wrapped =
+          GraphUtils.transform(filtered, p -> GitPathRootShaCachedOnFilteredFs.wrap(this, p));
       graph = ImmutableGraph.copyOf(wrapped);
     }
     return graph;
@@ -116,14 +118,16 @@ public class GitFilteringFs extends ForwardingGitFileSystem {
   @Override
   public ImmutableSet<GitPathRootRef> refs() throws IOException {
     final ImmutableSet<GitPathRootRef> refsWhole = super.refs();
-//		return CheckedStream.wrapping(refsWhole.stream()).map(GitPathRoot::toShaCached).map(GitPathRootShaCached::getCommit).filter(filter::test).collect(ImmutableSet.toImmutableSet());
+    // return
+    // CheckedStream.wrapping(refsWhole.stream()).map(GitPathRoot::toShaCached).map(GitPathRootShaCached::getCommit).filter(filter::test).collect(ImmutableSet.toImmutableSet());
     return CheckedStream.<GitPathRootRef, IOException>wrapping(refsWhole.stream())
         .filter(p -> filter.test(p.getCommit())).map(p -> GitPathRootRefOnFilteredFs.wrap(this, p))
         .collect(ImmutableSet.toImmutableSet());
   }
 
   @Override
-  public ImmutableSet<DiffEntry> diff(GitPathRoot first, GitPathRoot second) throws IOException, NoSuchFileException {
+  public ImmutableSet<DiffEntry> diff(GitPathRoot first, GitPathRoot second)
+      throws IOException, NoSuchFileException {
     checkArgument(this.equals(first.getFileSystem()));
     checkArgument(this.equals(second.getFileSystem()));
     verify(first.getFileSystem().equals(second.getFileSystem()));
@@ -158,5 +162,4 @@ public class GitFilteringFs extends ForwardingGitFileSystem {
     final IGitFileSystem iDelegate = delegate;
     return new GitFilteringFsProvider(iDelegate.provider());
   }
-
 }

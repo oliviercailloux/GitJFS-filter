@@ -10,8 +10,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 /**
- * Similar to a GitPath (which it wraps and delegates to) except linked to a
- * filteredFs.
+ * Similar to a GitPath (which it wraps and delegates to) except linked to a filteredFs.
  */
 final class GitPathOnFilteredFs extends ForwardingGitPath implements IGitPathOnFilteredFs {
 
@@ -62,7 +61,8 @@ final class GitPathOnFilteredFs extends ForwardingGitPath implements IGitPathOnF
   @Override
   public GitPathOnFilteredFs toAbsolutePath() {
     if (absolute == null) {
-      absolute = delegate.toAbsolutePath().equals(delegate) ? this : newWrapper(delegate.toAbsolutePath());
+      absolute =
+          delegate.toAbsolutePath().equals(delegate) ? this : newWrapper(delegate.toAbsolutePath());
     }
     return absolute;
   }
@@ -111,5 +111,4 @@ final class GitPathOnFilteredFs extends ForwardingGitPath implements IGitPathOnF
   public GitPathOnFilteredFs toRealPath(LinkOption... options) throws IOException {
     return newWrapper(delegate.toRealPath(options));
   }
-
 }

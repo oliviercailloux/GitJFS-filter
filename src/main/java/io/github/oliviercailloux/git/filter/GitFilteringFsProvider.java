@@ -44,14 +44,15 @@ class GitFilteringFsProvider extends GitFileSystemProvider {
   }
 
   @Override
-  public GitFileFileSystem newFileSystem(URI gitFsUri)
-      throws FileSystemAlreadyExistsException, UnsupportedOperationException, NoSuchFileException, IOException {
+  public GitFileFileSystem newFileSystem(URI gitFsUri) throws FileSystemAlreadyExistsException,
+      UnsupportedOperationException, NoSuchFileException, IOException {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public GitFileFileSystem newFileSystemFromGitDir(Path gitDir)
-      throws FileSystemAlreadyExistsException, UnsupportedOperationException, NoSuchFileException, IOException {
+      throws FileSystemAlreadyExistsException, UnsupportedOperationException, NoSuchFileException,
+      IOException {
     throw new UnsupportedOperationException();
   }
 
@@ -79,12 +80,14 @@ class GitFilteringFsProvider extends GitFileSystemProvider {
   }
 
   @Override
-  public IGitFileFileSystem getFileSystemFromGitDir(Path gitDir) throws FileSystemNotFoundException {
+  public IGitFileFileSystem getFileSystemFromGitDir(Path gitDir)
+      throws FileSystemNotFoundException {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public IGitDfsFileSystem getFileSystemFromRepositoryName(String name) throws FileSystemNotFoundException {
+  public IGitDfsFileSystem getFileSystemFromRepositoryName(String name)
+      throws FileSystemNotFoundException {
     throw new UnsupportedOperationException();
   }
 
@@ -99,18 +102,20 @@ class GitFilteringFsProvider extends GitFileSystemProvider {
   }
 
   @Override
-  public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs)
-      throws IOException {
+  public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options,
+      FileAttribute<?>... attrs) throws IOException {
     checkArgument(path instanceof IGitPathOnFilteredFs);
     final IGitPathOnFilteredFs gitPath = (IGitPathOnFilteredFs) path;
     return delegate().newByteChannel(gitPath.delegate(), options, attrs);
   }
 
   @Override
-  public DirectoryStream<Path> newDirectoryStream(Path dir, Filter<? super Path> filter) throws IOException {
+  public DirectoryStream<Path> newDirectoryStream(Path dir, Filter<? super Path> filter)
+      throws IOException {
     checkArgument(dir instanceof IGitPathOnFilteredFs);
     final IGitPathOnFilteredFs gitDir = (IGitPathOnFilteredFs) dir;
-    final DirectoryStream<Path> dirStream = delegate().newDirectoryStream(gitDir.delegate(), filter);
+    final DirectoryStream<Path> dirStream =
+        delegate().newDirectoryStream(gitDir.delegate(), filter);
     // FIXME this should return wrapped paths!
     return dirStream;
   }
@@ -146,25 +151,26 @@ class GitFilteringFsProvider extends GitFileSystemProvider {
   }
 
   @Override
-  public <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> type, LinkOption... options) {
+  public <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> type,
+      LinkOption... options) {
     checkArgument(path instanceof IGitPathOnFilteredFs);
     final IGitPathOnFilteredFs gitPath = (IGitPathOnFilteredFs) path;
     return delegate().getFileAttributeView(gitPath.delegate(), type, options);
   }
 
   @Override
-  public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type, LinkOption... options)
-      throws IOException {
+  public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type,
+      LinkOption... options) throws IOException {
     checkArgument(path instanceof IGitPathOnFilteredFs);
     final IGitPathOnFilteredFs gitPath = (IGitPathOnFilteredFs) path;
     return delegate().readAttributes(gitPath.delegate(), type, options);
   }
 
   @Override
-  public Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options) throws IOException {
+  public Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options)
+      throws IOException {
     checkArgument(path instanceof IGitPathOnFilteredFs);
     final IGitPathOnFilteredFs gitPath = (IGitPathOnFilteredFs) path;
     return delegate().readAttributes(gitPath.delegate(), attributes, options);
   }
-
 }
