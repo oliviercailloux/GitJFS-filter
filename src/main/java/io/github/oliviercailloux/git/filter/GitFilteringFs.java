@@ -119,7 +119,8 @@ public class GitFilteringFs extends ForwardingGitFileSystem {
   public ImmutableSet<GitPathRootRef> refs() throws IOException {
     final ImmutableSet<GitPathRootRef> refsWhole = super.refs();
     // return
-    // CheckedStream.wrapping(refsWhole.stream()).map(GitPathRoot::toShaCached).map(GitPathRootShaCached::getCommit).filter(filter::test).collect(ImmutableSet.toImmutableSet());
+    // CheckedStream.wrapping(refsWhole.stream()).map(GitPathRoot::toShaCached).map(GitPathRootSha
+    // Cached::getCommit).filter(filter::test).collect(ImmutableSet.toImmutableSet());
     return CheckedStream.<GitPathRootRef, IOException>wrapping(refsWhole.stream())
         .filter(p -> filter.test(p.getCommit())).map(p -> GitPathRootRefOnFilteredFs.wrap(this, p))
         .collect(ImmutableSet.toImmutableSet());
