@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * An alternative design would admit partial date information (some nodes being associated to no
  * date). But this complicates use, and is really only useful, probably, for push dates coming from
  * GitHub, which are incomplete. Better, for that specific use case, complete the information, as
- * done in {@link GitHubHistory}.
+ * done in {@code GitHubHistory}.
  * 
  * deprecated I think that the intent is to rather use {@link GitHistorySimple}.
  */

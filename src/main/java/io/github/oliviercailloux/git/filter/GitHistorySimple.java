@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * TODO consider using only (or mostly) paths instead of object ids.
  *
- * <h1>Old doc from GitFileSystemHistory</h1>
+ * <h2>Old doc from GitFileSystemHistory</h2>
  *
  * As a history, this is mainly and primarily a graph. It contains only id paths (meaning paths that
  * are object ids, not git refs). That is because as a graph of nodes representing the parent
@@ -60,6 +60,7 @@ import org.slf4j.LoggerFactory;
  * OR filter only on refs, thus filter(T.P≤GPR> refPredicate, TP≤GP>); and provide:?
  * <p>
  * Use cases.
+ * <ul>
  * <li>given branch / given file name pattern / given content pattern / exists?
  * <li>in all oids: given file name pattern, given content pattern, exists?
  * <li>all match and exists: given branch, given file name pattern=> all and some (i.e., the one)
@@ -68,18 +69,24 @@ import org.slf4j.LoggerFactory;
  * <li>Is there any file named "some file" in any commit, anywhere? VS is there some commit
  * containing "afile.txt" satisfying x VS is there a branch "origin" with "afile.txt" satisfying x
  * VS is there in branch "dev" a file named "some file", anywhere?
+ * </ul>
  * <p>
  * To do this:
+ * <ul>
  * <li>anyMathAmongRefs(TP≤GPR> refPredicate, TP≤GP> filePredicate)
  * <li>anyMatch(TP≤GP> filePredicate) // all roots are oids
  * <li><b>Most promising!</b>
  * <li>And consider: filter(TP≤ObjectId>) throws IOE.
+ * </ul>
  * <p>
  * Or, more general:
+ * <ul>
  * <li>getPathsAmongRefs(TP≤GPR>, TP≤GP>).
  * <li>getPathsAmongOids(TP≤GP>).
+ * </ul>
  * <p>
  * Or, more elegant:
+ * <ul>
  * <li>getPathsAmongRefs(TP≤GP>) ≤= special interface, if it’s a CombinedPredicate, it can filter on
  * roots as well as on files.
  * <li>Decide to use exclusively parameters of GPR rather than ObjectId, for consistency: this
@@ -93,11 +100,12 @@ import org.slf4j.LoggerFactory;
  * satisfying x, but then 1) it explores everything inside for nothing; 2) it sends back a set of
  * paths whereas we really only care about filtering roots. We really need a solution with a
  * predicate over symbolic roots.
- * <p>
+ * </ul>
+ * <ul>
  * <li>getRefsMatching(TP≤GPR>): Set≤GPR>
  * <li>For finding in "dev" all files named "some file": use getRefsMatching() to get dev, then use
  * a static method to find the paths.
- *
+ *</ul>
  */
 public class GitHistorySimple {
   @SuppressWarnings("unused")
@@ -228,7 +236,6 @@ public class GitHistorySimple {
    *
    * @param filter indicates which elements should be kept
    * @return a filtering file system
-   * @throws IOException
    */
   public GitFileSystem filterDate(Predicate<Instant> filter) {
     return GitFilteringFs.filter(fs, p -> filter.test(dates.get(p.id())));
