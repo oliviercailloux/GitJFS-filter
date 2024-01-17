@@ -10,7 +10,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.graph.Graph;
 import com.google.common.graph.ImmutableGraph;
-import io.github.oliviercailloux.git.filter.GitFilteringFs;
 import io.github.oliviercailloux.gitjfs.Commit;
 import io.github.oliviercailloux.gitjfs.GitFileSystem;
 import io.github.oliviercailloux.gitjfs.GitPathRootShaCached;
@@ -37,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * An alternative design would admit partial date information (some nodes being associated to no
  * date). But this complicates use, and is really only useful, probably, for push dates coming from
  * GitHub, which are incomplete. Better, for that specific use case, complete the information, as
- * done in {@link GitHubHistory}.
+ * done in {@code GitHubHistory}.
  * <p>
  * TODO consider using only (or mostly) paths instead of object ids.
  *
