@@ -70,8 +70,8 @@ class GitUtilsTests {
       commit.setCommitter(new PersonIdent("Me", "email"));
       commit.setMessage("New commit");
       newCommit = commit.call();
-      /* TODO this seems to depend on git config: seems to be "main" on some other computer. */
-      final Ref main = git.getRepository().exactRef("refs/heads/master");
+      /* TODO this seems to depend on git config: seems to be "master" on some other computer. */
+      final Ref main = git.getRepository().exactRef("refs/heads/main");
       final ObjectId objectId = main.getObjectId();
       Verify.verify(objectId.equals(newCommit));
     }
