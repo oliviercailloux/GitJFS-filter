@@ -4,22 +4,23 @@
 	<parent>
 		<groupId>io.github.oliviercailloux</groupId>
 		<artifactId>pom</artifactId>
-		<version>0.0.21</version>
+		<version>0.0.22</version>
 	</parent>
-	<groupId>io.github.oliviercailloux.git</groupId>
-	<artifactId>filter</artifactId>
+	<name>GitJFS filter</name>
+	<artifactId>gitjfs-filter</artifactId>
 	<version>0.0.4-SNAPSHOT</version>
+	<url>https://github.com/oliviercailloux/GitJFS-filter</url>
 
 	<dependencies>
 		<dependency>
-			<groupId>io.github.oliviercailloux.git</groupId>
-			<artifactId>jfs</artifactId>
-			<version>0.0.5</version>
+			<groupId>io.github.oliviercailloux</groupId>
+			<artifactId>gitjfs</artifactId>
+			<version>0.0.6-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>io.github.oliviercailloux.git</groupId>
-			<artifactId>factory</artifactId>
-			<version>0.0.2</version>
+			<groupId>io.github.oliviercailloux</groupId>
+			<artifactId>git-factory</artifactId>
+			<version>0.0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jgrapht</groupId>

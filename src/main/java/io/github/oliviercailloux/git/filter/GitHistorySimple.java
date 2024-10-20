@@ -14,7 +14,7 @@ import io.github.oliviercailloux.gitjfs.Commit;
 import io.github.oliviercailloux.gitjfs.GitFileSystem;
 import io.github.oliviercailloux.gitjfs.GitPathRootShaCached;
 import io.github.oliviercailloux.jaris.collections.CollectionUtils;
-import io.github.oliviercailloux.jaris.collections.GraphUtils;
+import io.github.oliviercailloux.jaris.graphs.GraphUtils;
 import io.github.oliviercailloux.jaris.throwing.TPredicate;
 import java.io.IOException;
 import java.time.Instant;
