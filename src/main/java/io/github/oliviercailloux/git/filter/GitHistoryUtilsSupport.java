@@ -22,6 +22,7 @@ public class GitHistoryUtilsSupport {
   /**
    * @deprecated use the jaris version (and remove the copy of this one in GitHistory?)
    */
+  @Deprecated
   public static <E, F extends E> Graph<E> asGraph(SuccessorsFunction<F> successorsFunction,
       Set<F> roots) {
     checkNotNull(successorsFunction);
@@ -60,6 +61,7 @@ public class GitHistoryUtilsSupport {
   /**
    * @deprecated see the Jaris version
    */
+  @Deprecated
   public static <E, F> ImmutableGraph<F> asImmutableGraph(Graph<E> graph,
       Function<E, F> transformer) {
     final GraphBuilder<Object> startBuilder =
