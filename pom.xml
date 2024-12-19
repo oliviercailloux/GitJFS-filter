@@ -8,7 +8,7 @@
 	</parent>
 	<name>GitJFS filter</name>
 	<artifactId>gitjfs-filter</artifactId>
-	<version>0.0.4</version>
+	<version>0.0.5-SNAPSHOT</version>
 	<url>https://github.com/oliviercailloux/GitJFS-filter</url>
 
 	<dependencies>
