@@ -66,7 +66,7 @@ final class GitPathRootRefOnFilteredFs extends ForwardingGitPathRootRef
 
   @Deprecated
   @Override
-  public GitPathRoot getRoot() {
+  public IGitPathRootOnFilteredFs getRoot() {
     verify(delegate.getRoot().equals(delegate));
     return this;
   }

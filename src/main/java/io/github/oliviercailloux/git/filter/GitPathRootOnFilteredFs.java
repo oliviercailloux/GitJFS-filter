@@ -3,6 +3,7 @@ package io.github.oliviercailloux.git.filter;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Verify.verify;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.github.oliviercailloux.gitjfs.Commit;
 import io.github.oliviercailloux.gitjfs.ForwardingGitPath;
@@ -11,6 +12,8 @@ import io.github.oliviercailloux.gitjfs.GitPath;
 import io.github.oliviercailloux.gitjfs.GitPathRoot;
 import io.github.oliviercailloux.gitjfs.GitPathRootSha;
 import io.github.oliviercailloux.gitjfs.GitPathRootShaCached;
+import io.github.oliviercailloux.gitjfs.impl.GitPathImpl;
+import io.github.oliviercailloux.jaris.exceptions.CheckedStream;
 import java.io.IOException;
 import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
@@ -75,7 +78,7 @@ final class GitPathRootOnFilteredFs extends ForwardingGitPathRoot
 
   @Deprecated
   @Override
-  public GitPathRoot getRoot() {
+  public IGitPathRootOnFilteredFs getRoot() {
     verify(delegate.getRoot().equals(delegate));
     return this;
   }
@@ -111,6 +114,23 @@ final class GitPathRootOnFilteredFs extends ForwardingGitPathRoot
 
   @Override
   public GitPath resolve(Path other) {
+    /* We can probably return an IGitPathRootOnFilteredFs here */
+    /* If the general contract permits this, we could in principle also work with a non filtered other path (then the return type cannot be a filtered path). */
+    if (!getFileSystem().equals(other.getFileSystem())) {
+      throw new IllegalArgumentException();
+    }
+
+    final GitPathRootOnFilteredFs p2 = (GitPathRootOnFilteredFs) other;
+
+    if (other.isAbsolute()) {
+      return p2;
+    }
+
+    return GitPathOnFilteredFs.wrap(fs, delegate.resolve(p2.delegate()));
+  }
+
+  @Override
+  public GitPath resolve(String other) {
     return GitPathOnFilteredFs.wrap(fs, delegate.resolve(other));
   }
 
@@ -137,5 +157,20 @@ final class GitPathRootOnFilteredFs extends ForwardingGitPathRoot
           filteredParentIds, underlyingParents);
     }
     return underlying;
+  }
+
+  @Override
+  public ImmutableList<GitPathRootSha> getParentCommits() throws NoSuchFileException, IOException {
+    return getParentCommitsGivenFs(fs, this);
+  }
+  
+  public static ImmutableList<GitPathRootSha> getParentCommitsGivenFs(
+      GitFilteringFs fs, IGitPathRootOnFilteredFs start) throws NoSuchFileException, IOException {
+    if (fs.computedGraph()) {
+      return ImmutableList.copyOf(fs.graph().predecessors(start.toShaCached()));
+    }
+    ImmutableList<GitPathRootSha> parentCommits = start.delegate().getParentCommits();
+    return CheckedStream.<GitPathRootSha, IOException>from(parentCommits).filter(c -> fs.visible(c.getCommit()))
+        .map(c -> GitPathRootShaOnFilteredFs.wrap(fs, c)).collect(ImmutableList.toImmutableList());
   }
 }

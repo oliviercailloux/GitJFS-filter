@@ -61,6 +61,14 @@ public class GitFilteringFs extends ForwardingGitFileSystem {
     return delegate;
   }
 
+  boolean visible(IGitPathRootOnFilteredFs path) throws NoSuchFileException, IOException {
+    return filter.test(path.delegate().getCommit());
+  }
+
+  boolean visible(Commit commit) throws NoSuchFileException, IOException {
+    return filter.test(commit);
+  }
+
   @Override
   public GitPath getPath(String first, String... more) {
     return GitPathOnFilteredFs.wrap(this, super.getPath(first, more));
@@ -97,6 +105,10 @@ public class GitFilteringFs extends ForwardingGitFileSystem {
     return GitPathOnFilteredFs.wrap(this, super.getRelativePath(names));
   }
 
+  boolean computedGraph() {
+    return graph != null;
+  }
+  
   @Override
   public ImmutableGraph<GitPathRootShaCached> graph() throws IOException {
     if (graph == null) {

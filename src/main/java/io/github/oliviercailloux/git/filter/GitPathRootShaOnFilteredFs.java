@@ -3,9 +3,12 @@ package io.github.oliviercailloux.git.filter;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Verify.verify;
 
+import com.google.common.collect.ImmutableList;
 import io.github.oliviercailloux.gitjfs.ForwardingGitPath;
 import io.github.oliviercailloux.gitjfs.ForwardingGitPathRootSha;
+import io.github.oliviercailloux.gitjfs.GitPath;
 import io.github.oliviercailloux.gitjfs.GitPathRootSha;
+import io.github.oliviercailloux.gitjfs.GitPathRootShaCached;
 import java.io.IOException;
 import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
@@ -33,7 +36,12 @@ final class GitPathRootShaOnFilteredFs extends ForwardingGitPathRootSha
 
   @Override
   public GitPathRootShaCachedOnFilteredFs toShaCached() throws IOException, NoSuchFileException {
-    return GitPathRootShaCachedOnFilteredFs.wrap(getFileSystem(), super.toShaCached());
+    GitPathRootShaCached delegateCached = delegate.toShaCached();
+    if (!fs.visible(delegateCached.getCommit())) {
+      throw new NoSuchFileException(this.toString());
+    }
+   
+    return GitPathRootShaCachedOnFilteredFs.wrap(getFileSystem(), delegateCached);
   }
 
   @Override
@@ -105,7 +113,22 @@ final class GitPathRootShaOnFilteredFs extends ForwardingGitPathRootSha
   }
 
   @Override
-  public GitPathOnFilteredFs resolve(Path other) {
+  public IGitPathOnFilteredFs resolve(Path other) {
+    if (!getFileSystem().equals(other.getFileSystem())) {
+      throw new IllegalArgumentException();
+    }
+
+    final IGitPathOnFilteredFs p2 = (IGitPathOnFilteredFs) other;
+
+    if (other.isAbsolute()) {
+      return p2;
+    }
+
+    return GitPathOnFilteredFs.wrap(fs, delegate.resolve(p2.delegate()));
+  }
+
+  @Override
+  public GitPath resolve(String other) {
     return GitPathOnFilteredFs.wrap(fs, delegate.resolve(other));
   }
 
@@ -118,4 +141,10 @@ final class GitPathRootShaOnFilteredFs extends ForwardingGitPathRootSha
   public GitPathOnFilteredFs toRealPath(LinkOption... options) throws IOException {
     return GitPathOnFilteredFs.wrap(fs, delegate.toRealPath(options));
   }
+
+  @Override
+  public ImmutableList<GitPathRootSha> getParentCommits() throws IOException, NoSuchFileException {
+    return GitPathRootOnFilteredFs.getParentCommitsGivenFs(fs, this);
+  }
+  
 }

@@ -104,16 +104,23 @@ class GitFilteringFsProvider extends GitFileSystemProvider {
   @Override
   public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options,
       FileAttribute<?>... attrs) throws IOException {
+    final IGitPathOnFilteredFs gitPath = asVisible(path);
+    return delegate().newByteChannel(gitPath.delegate(), options, attrs);
+  }
+
+  private IGitPathOnFilteredFs asVisible(Path path) throws NoSuchFileException, IOException {
     checkArgument(path instanceof IGitPathOnFilteredFs);
     final IGitPathOnFilteredFs gitPath = (IGitPathOnFilteredFs) path;
-    return delegate().newByteChannel(gitPath.delegate(), options, attrs);
+    if (!gitPath.getFileSystem().visible(gitPath.getRoot())) {
+      throw new NoSuchFileException(path.toString());
+    }
+    return gitPath;
   }
 
   @Override
   public DirectoryStream<Path> newDirectoryStream(Path dir, Filter<? super Path> filter)
       throws IOException {
-    checkArgument(dir instanceof IGitPathOnFilteredFs);
-    final IGitPathOnFilteredFs gitDir = (IGitPathOnFilteredFs) dir;
+    final IGitPathOnFilteredFs gitDir = asVisible(dir);
     final DirectoryStream<Path> dirStream =
         delegate().newDirectoryStream(gitDir.delegate(), filter);
     // FIXME this should return wrapped paths!
@@ -131,8 +138,7 @@ class GitFilteringFsProvider extends GitFileSystemProvider {
 
   @Override
   public boolean isHidden(Path path) throws IOException {
-    checkArgument(path instanceof IGitPathOnFilteredFs);
-    final IGitPathOnFilteredFs gitPath = (IGitPathOnFilteredFs) path;
+    final IGitPathOnFilteredFs gitPath = asVisible(path);
     return delegate().isHidden(gitPath.delegate());
   }
 
@@ -145,32 +151,31 @@ class GitFilteringFsProvider extends GitFileSystemProvider {
 
   @Override
   public void checkAccess(Path path, AccessMode... modes) throws IOException {
-    checkArgument(path instanceof IGitPathOnFilteredFs);
-    final IGitPathOnFilteredFs gitPath = (IGitPathOnFilteredFs) path;
+    final IGitPathOnFilteredFs gitPath = asVisible(path);
     delegate().checkAccess(gitPath.delegate(), modes);
   }
 
   @Override
   public <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> type,
       LinkOption... options) {
-    checkArgument(path instanceof IGitPathOnFilteredFs);
-    final IGitPathOnFilteredFs gitPath = (IGitPathOnFilteredFs) path;
-    return delegate().getFileAttributeView(gitPath.delegate(), type, options);
+    /*
+     * Not trivial to implement: we should return a class which itself returns NoSuchStuff if the
+     * path does not exist.
+     */
+    return null;
   }
 
   @Override
   public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type,
       LinkOption... options) throws IOException {
-    checkArgument(path instanceof IGitPathOnFilteredFs);
-    final IGitPathOnFilteredFs gitPath = (IGitPathOnFilteredFs) path;
+    final IGitPathOnFilteredFs gitPath = asVisible(path);
     return delegate().readAttributes(gitPath.delegate(), type, options);
   }
 
   @Override
   public Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options)
       throws IOException {
-    checkArgument(path instanceof IGitPathOnFilteredFs);
-    final IGitPathOnFilteredFs gitPath = (IGitPathOnFilteredFs) path;
+    final IGitPathOnFilteredFs gitPath = asVisible(path);
     return delegate().readAttributes(gitPath.delegate(), attributes, options);
   }
 }

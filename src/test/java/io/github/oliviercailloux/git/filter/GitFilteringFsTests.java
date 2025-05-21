@@ -11,13 +11,14 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.UnmodifiableIterator;
 import com.google.common.graph.ImmutableGraph;
 import io.github.oliviercailloux.git.factory.JGit;
-import io.github.oliviercailloux.git.filter.GitFilteringFs;
 import io.github.oliviercailloux.gitjfs.GitDfsFileSystem;
 import io.github.oliviercailloux.gitjfs.GitFileSystemProvider;
 import io.github.oliviercailloux.gitjfs.GitPathRootSha;
 import io.github.oliviercailloux.gitjfs.GitPathRootShaCached;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributeView;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffEntry.ChangeType;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepository;
@@ -48,6 +49,33 @@ public class GitFilteringFsTests {
         final GitPathRootShaCached firstNode = all.graph().nodes().iterator().next();
         assertEquals(c2, firstNode);
         assertTrue(Files.exists(c0));
+      }
+    }
+  }
+
+  @Test
+  void testReadMiss() throws Exception {
+    try (DfsRepository repo = new InMemoryRepository(new DfsRepositoryDescription("myrepo"))) {
+      final ImmutableList<ObjectId> commits = JGit.createRepoWithSubDir(repo);
+      assertEquals(3, commits.size());
+      try (GitDfsFileSystem fs =
+          GitFileSystemProvider.instance().newFileSystemFromDfsRepository(repo)) {
+        LOGGER.debug("Shas: " + fs.graph().nodes());
+
+        final GitFilteringFs first = GitFilteringFs.filter(fs, c -> c.id().equals(commits.get(0)));
+
+        final GitPathRootShaCached c0 = first.getPathRoot(commits.get(0)).toShaCached();
+        assertTrue(Files.exists(c0));
+
+        GitPathRootSha c2 = first.getPathRoot(commits.get(2));
+        assertThrows(NoSuchFileException.class, () -> c2.getFileSystem().provider().checkAccess(c2));
+        assertThrows(NoSuchFileException.class, () -> Files.readString(c2));
+        assertFalse(Files.exists(c2));
+        assertFalse(Files.exists(c2.resolve(first.getPath("ploum"))));
+        assertFalse(Files.exists(c2.resolve("")));
+        assertThrows(NoSuchFileException.class, () -> c2.toShaCached());
+    // BasicFileAttributeView v = c2.getFileSystem().provider().getFileAttributeView(c2, BasicFileAttributeView.class);
+    // assertThrows(NoSuchFileException.class, () -> v.readAttributes());
       }
     }
   }

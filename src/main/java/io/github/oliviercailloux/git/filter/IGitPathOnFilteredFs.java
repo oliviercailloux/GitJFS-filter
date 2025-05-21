@@ -6,4 +6,10 @@ import io.github.oliviercailloux.gitjfs.GitPath;
 sealed interface IGitPathOnFilteredFs extends GitPath
     permits IGitPathRootOnFilteredFs, GitPathOnFilteredFs {
   GitPath delegate();
+
+  @Override
+  GitFilteringFs getFileSystem();
+  
+  @Override
+  IGitPathRootOnFilteredFs getRoot();
 }

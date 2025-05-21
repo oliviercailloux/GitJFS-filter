@@ -3,13 +3,16 @@ package io.github.oliviercailloux.git.filter;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Verify.verify;
 
+import com.google.common.collect.ImmutableList;
 import io.github.oliviercailloux.gitjfs.ForwardingGitPath;
 import io.github.oliviercailloux.gitjfs.ForwardingGitPathRootShaCached;
 import io.github.oliviercailloux.gitjfs.GitPath;
 import io.github.oliviercailloux.gitjfs.GitPathRoot;
+import io.github.oliviercailloux.gitjfs.GitPathRootSha;
 import io.github.oliviercailloux.gitjfs.GitPathRootShaCached;
 import java.io.IOException;
 import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Objects;
 
@@ -72,7 +75,7 @@ final class GitPathRootShaCachedOnFilteredFs extends ForwardingGitPathRootShaCac
 
   @Override
   @Deprecated
-  public GitPathRoot getRoot() {
+  public IGitPathRootOnFilteredFs getRoot() {
     verify(delegate.getRoot().equals(delegate));
     return this;
   }
@@ -107,6 +110,11 @@ final class GitPathRootShaCachedOnFilteredFs extends ForwardingGitPathRootShaCac
   }
 
   @Override
+  public GitPath resolve(String other) {
+    return GitPathOnFilteredFs.wrap(fs, delegate.resolve(other));
+  }
+
+  @Override
   public GitPath resolve(Path other) {
     return GitPathOnFilteredFs.wrap(fs, delegate.resolve(other));
   }
@@ -119,5 +127,10 @@ final class GitPathRootShaCachedOnFilteredFs extends ForwardingGitPathRootShaCac
   @Override
   public GitPath toRealPath(LinkOption... options) throws IOException {
     return GitPathOnFilteredFs.wrap(fs, delegate.toRealPath(options));
+  }
+
+  @Override
+  public ImmutableList<GitPathRootSha> getParentCommits() throws IOException, NoSuchFileException {
+    return GitPathRootOnFilteredFs.getParentCommitsGivenFs(fs, this);
   }
 }
