@@ -115,7 +115,10 @@ final class GitPathRootOnFilteredFs extends ForwardingGitPathRoot
   @Override
   public GitPath resolve(Path other) {
     /* We can probably return an IGitPathRootOnFilteredFs here */
-    /* If the general contract permits this, we could in principle also work with a non filtered other path (then the return type cannot be a filtered path). */
+    /*
+     * If the general contract permits this, we could in principle also work with a non filtered
+     * other path (then the return type cannot be a filtered path).
+     */
     if (!getFileSystem().equals(other.getFileSystem())) {
       throw new IllegalArgumentException();
     }
@@ -161,16 +164,10 @@ final class GitPathRootOnFilteredFs extends ForwardingGitPathRoot
 
   @Override
   public ImmutableList<GitPathRootSha> getParentCommits() throws NoSuchFileException, IOException {
-    return getParentCommitsGivenFs(fs, this);
-  }
-  
-  public static ImmutableList<GitPathRootSha> getParentCommitsGivenFs(
-      GitFilteringFs fs, IGitPathRootOnFilteredFs start) throws NoSuchFileException, IOException {
-    if (fs.computedGraph()) {
-      return ImmutableList.copyOf(fs.graph().predecessors(start.toShaCached()));
-    }
-    ImmutableList<GitPathRootSha> parentCommits = start.delegate().getParentCommits();
-    return CheckedStream.<GitPathRootSha, IOException>from(parentCommits).filter(c -> fs.visible(c.getCommit()))
-        .map(c -> GitPathRootShaOnFilteredFs.wrap(fs, c)).collect(ImmutableList.toImmutableList());
+    /*
+     * Requires to compute a (local) transitive reduction. Unless going for very complex
+     * implementation, this requires to compute the whole filtered graph.
+     */
+    return ImmutableList.copyOf(fs.graph().predecessors(toShaCached()));
   }
 }

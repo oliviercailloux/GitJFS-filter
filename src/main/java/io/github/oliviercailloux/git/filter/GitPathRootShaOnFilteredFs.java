@@ -144,7 +144,7 @@ final class GitPathRootShaOnFilteredFs extends ForwardingGitPathRootSha
 
   @Override
   public ImmutableList<GitPathRootSha> getParentCommits() throws IOException, NoSuchFileException {
-    return GitPathRootOnFilteredFs.getParentCommitsGivenFs(fs, this);
+    return ImmutableList.copyOf(fs.graph().predecessors(toShaCached()));
   }
   
 }

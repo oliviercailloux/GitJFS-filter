@@ -54,7 +54,7 @@ public class GitFilteringFsTests {
   }
 
   @Test
-  void testReadMiss() throws Exception {
+  void testReadOnlyZero() throws Exception {
     try (DfsRepository repo = new InMemoryRepository(new DfsRepositoryDescription("myrepo"))) {
       final ImmutableList<ObjectId> commits = JGit.createRepoWithSubDir(repo);
       assertEquals(3, commits.size());
@@ -74,8 +74,37 @@ public class GitFilteringFsTests {
         assertFalse(Files.exists(c2.resolve(first.getPath("ploum"))));
         assertFalse(Files.exists(c2.resolve("")));
         assertThrows(NoSuchFileException.class, () -> c2.toShaCached());
+        assertEquals(ImmutableList.of(), c0.getParentCommits());
     // BasicFileAttributeView v = c2.getFileSystem().provider().getFileAttributeView(c2, BasicFileAttributeView.class);
     // assertThrows(NoSuchFileException.class, () -> v.readAttributes());
+      }
+    }
+  }
+
+  @Test
+  void testReadZeroTwo() throws Exception {
+    try (DfsRepository repo = new InMemoryRepository(new DfsRepositoryDescription("myrepo"))) {
+      final ImmutableList<ObjectId> commits = JGit.createRepoWithSubDir(repo);
+      assertEquals(3, commits.size());
+      try (GitDfsFileSystem fs =
+          GitFileSystemProvider.instance().newFileSystemFromDfsRepository(repo)) {
+        LOGGER.debug("Shas: " + fs.graph().nodes());
+
+        final GitFilteringFs filtered = GitFilteringFs.filter(fs, c -> c.id().equals(commits.get(0)) || c.id().equals(commits.get(2)));
+
+        final GitPathRootShaCached c0 = filtered.getPathRoot(commits.get(0)).toShaCached();
+        assertTrue(Files.exists(c0));
+        final GitPathRootShaCached c2 = filtered.getPathRoot(commits.get(2)).toShaCached();
+        assertTrue(Files.exists(c2));
+
+        GitPathRootSha c1 = filtered.getPathRoot(commits.get(1));
+        assertThrows(NoSuchFileException.class, () -> c1.getFileSystem().provider().checkAccess(c1));
+        assertThrows(NoSuchFileException.class, () -> Files.readString(c1));
+        assertFalse(Files.exists(c1));
+        assertFalse(Files.exists(c1.resolve(filtered.getPath("ploum"))));
+        assertFalse(Files.exists(c1.resolve("")));
+        assertThrows(NoSuchFileException.class, () -> c1.toShaCached());
+        assertEquals(ImmutableList.of(c0), c2.getParentCommits());
       }
     }
   }
