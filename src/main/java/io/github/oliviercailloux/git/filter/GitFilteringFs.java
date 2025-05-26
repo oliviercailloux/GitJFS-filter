@@ -32,6 +32,7 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.jgrapht.alg.TransitiveReduction;
 import org.jgrapht.graph.guava.MutableGraphAdapter;
 
+/** Actually we could probably vastly simplify this whole implementation. Getting any commit requires to load the graph. And doing anything useful (such as reading) with a path requires to get the commit, to check whether it is filtered out. Thus, we might as well load the graph early, rather than lazily. And the graph contains only cached paths. Thus, we might as well use only cached paths. */
 public class GitFilteringFs extends ForwardingGitFileSystem {
 
   /**

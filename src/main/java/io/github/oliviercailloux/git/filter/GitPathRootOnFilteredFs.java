@@ -71,6 +71,28 @@ final class GitPathRootOnFilteredFs extends ForwardingGitPathRoot
 
   @Deprecated
   @Override
+  public GitPathRootSha toSha() throws IOException, NoSuchFileException {
+    GitPathRootSha delegateCached = delegate.toSha();
+    if (!fs.visible(delegateCached.getCommit())) {
+      throw new NoSuchFileException(this.toString());
+    }
+   
+    return GitPathRootShaOnFilteredFs.wrap(getFileSystem(), delegateCached);
+  }
+
+  @Override
+  public GitPathRootShaCachedOnFilteredFs toShaCached() throws IOException, NoSuchFileException {
+    fs.graph();
+    GitPathRootShaCached delegateCached = delegate.toShaCached();
+    if (!fs.visible(delegateCached.getCommit())) {
+      throw new NoSuchFileException(this.toString());
+    }
+   
+    return GitPathRootShaCachedOnFilteredFs.wrap(getFileSystem(), delegateCached);
+  }
+
+  @Deprecated
+  @Override
   public GitPathRoot toAbsolutePath() {
     verify(delegate.toAbsolutePath().equals(delegate));
     return this;
@@ -149,17 +171,14 @@ final class GitPathRootOnFilteredFs extends ForwardingGitPathRoot
 
   @Override
   public Commit getCommit() throws IOException, NoSuchFileException {
-    final GitPathRootShaCached cached = this.toShaCached();
-    final Commit underlying = cached.getCommit();
-    final ImmutableSet<ObjectId> underlyingParents = ImmutableSet.copyOf(underlying.parents());
+    final GitPathRootShaCachedOnFilteredFs cached = toShaCached();
+    final Commit underlying = cached.delegate().getCommit();
     final Set<GitPathRootShaCached> filteredParents = fs.graph().predecessors(cached);
-    final ImmutableSet<ObjectId> filteredParentIds = filteredParents.stream()
-        .map(GitPathRootSha::getStaticCommitId).collect(ImmutableSet.toImmutableSet());
-    if (!underlyingParents.equals(filteredParentIds)) {
-      LOGGER.warn("Commit’s filtered parents {} should replace the returned ones {}.",
-          filteredParentIds, underlyingParents);
-    }
-    return underlying;
+    final ImmutableList<ObjectId> filteredParentIds = filteredParents.stream()
+        .map(GitPathRootSha::getStaticCommitId).collect(ImmutableList.toImmutableList());
+    return Commit.from(underlying.id(), underlying.authorName(), underlying.authorEmail(), underlying.committerDate(),
+        underlying.committerName(), underlying.committerEmail(), underlying.authorDate(),
+        filteredParentIds);
   }
 
   @Override

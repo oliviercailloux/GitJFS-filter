@@ -1,4 +1,4 @@
-package io.github.oliviercailloux.git.filter;
+package io.github.oliviercailloux.git.filter.date;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -25,25 +25,22 @@ import org.eclipse.jgit.lib.ObjectId;
  * Similar to a {@link GitPathRootShaCached} (which it wraps and delegates to) except linked to a
  * filteredFs.
  */
-final class GitPathRootShaCachedOnFilteredFs extends ForwardingGitPathRootShaCached
-    implements IGitPathRootOnFilteredFs {
+final class GitPathRootShaCachedDated implements GitPathRootShaCached {
 
-  static GitPathRootShaCachedOnFilteredFs wrap(GitFilteringFs fs, GitPathRootShaCached delegate) {
-    return new GitPathRootShaCachedOnFilteredFs(fs, delegate);
+  static GitPathRootShaCachedDated wrap(GitDaterFs fs, GitPathRootShaCached delegate) {
+    return new GitPathRootShaCachedDated(fs, delegate);
   }
 
-  private final GitFilteringFs fs;
+  private final GitDaterFs fs;
   private final GitPathRootShaCached delegate;
 
-  private GitPathRootShaCachedOnFilteredFs(GitFilteringFs fs, GitPathRootShaCached delegate) {
-    /* We cannot compute the commit lazily in this class as getCommit may not throw IOE. Thus, we need the fs graph at this stage. However, we cannot check that it is computed right now as we serve as nodes of the graph being possibly built when calling this method. */
-    // checkState(fs.computedGraph());
+  private GitPathRootShaCachedDated(GitDaterFs fs, GitPathRootShaCached delegate) {
     this.fs = checkNotNull(fs);
     this.delegate = checkNotNull(delegate);
   }
 
   @Override
-  public GitFilteringFs getFileSystem() {
+  public GitDaterFs getFileSystem() {
     return fs;
   }
 
@@ -59,7 +56,6 @@ final class GitPathRootShaCachedOnFilteredFs extends ForwardingGitPathRootShaCac
     return this;
   }
 
-  @Override
   public GitPathRootShaCached delegate() {
     return delegate;
   }
@@ -88,14 +84,14 @@ final class GitPathRootShaCachedOnFilteredFs extends ForwardingGitPathRootShaCac
 
   @Override
   @Deprecated
-  public IGitPathRootOnFilteredFs getRoot() {
+  public GitPathRoot getRoot() {
     verify(delegate.getRoot().equals(delegate));
     return this;
   }
 
   @Override
   @Deprecated
-  public GitPathRootOnFilteredFs getFileName() {
+  public GitPathRoot getFileName() {
     verify(delegate.getFileName() == null);
     return null;
   }

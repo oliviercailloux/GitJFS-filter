@@ -71,9 +71,12 @@ public class GitFilteringFsTests {
         assertThrows(NoSuchFileException.class, () -> c2.getFileSystem().provider().checkAccess(c2));
         assertThrows(NoSuchFileException.class, () -> Files.readString(c2));
         assertFalse(Files.exists(c2));
+        assertFalse(Files.exists(c2.getRoot()));
+        assertFalse(Files.exists(c2.toSha()));
         assertFalse(Files.exists(c2.resolve(first.getPath("ploum"))));
         assertFalse(Files.exists(c2.resolve("")));
         assertThrows(NoSuchFileException.class, () -> c2.toShaCached());
+        assertThrows(NoSuchFileException.class, () -> c2.getCommit());
         assertEquals(ImmutableList.of(), c0.getParentCommits());
     // BasicFileAttributeView v = c2.getFileSystem().provider().getFileAttributeView(c2, BasicFileAttributeView.class);
     // assertThrows(NoSuchFileException.class, () -> v.readAttributes());
@@ -105,6 +108,7 @@ public class GitFilteringFsTests {
         assertFalse(Files.exists(c1.resolve("")));
         assertThrows(NoSuchFileException.class, () -> c1.toShaCached());
         assertEquals(ImmutableList.of(c0), c2.getParentCommits());
+        assertEquals(ImmutableList.of(commits.get(0)), c2.getCommit().parents());
       }
     }
   }
@@ -175,5 +179,10 @@ public class GitFilteringFsTests {
         }
       }
     }
+  }
+
+  @Test
+  void testWrapPathWithPathRootAndCheckItsAPathRoot() throws Exception {
+    TODO
   }
 }
