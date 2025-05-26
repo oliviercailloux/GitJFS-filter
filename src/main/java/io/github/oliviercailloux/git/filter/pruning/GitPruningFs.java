@@ -9,8 +9,8 @@ import io.github.oliviercailloux.git.filter.wrapping.GitWrappingFs;
 import io.github.oliviercailloux.gitjfs.GitPathRootShaCached;
 import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.Queue;
 import java.util.Set;
 import org.eclipse.jgit.lib.ObjectId;
 
@@ -30,9 +30,10 @@ public class GitPruningFs extends GitWrappingFs {
     return new GitPruningFs(delegate, pruneGraph(full, invisibleStarts));
   }
 
-  private static Graph<GitPathRootShaCached> pruneGraph(Graph<GitPathRootShaCached> fullGraph,
+  static Graph<GitPathRootShaCached> pruneGraph(Graph<GitPathRootShaCached> fullGraph,
       Set<ObjectId> invisibleStarts) {
 
+    Set<GitPathRootShaCached> visited = new HashSet<>();
     Set<ObjectId> invisiblesSoFar = new LinkedHashSet<>(invisibleStarts);
     MutableGraph<GitPathRootShaCached> prunedGraph = GraphBuilder.from(fullGraph).build();
 
@@ -53,6 +54,10 @@ public class GitPruningFs extends GitWrappingFs {
         current = lifo.pop();
         visiblePart = !invisiblesSoFar.contains(current.getStaticCommitId());
       }
+      if (visited.contains(current)) {
+        continue;
+      }
+      visited.add(current);
       if (visiblePart) {
         prunedGraph.addNode(current);
       } else {
