@@ -79,7 +79,12 @@ public class GitWrappingFs extends GitFileSystem {
     return GitPathRootShaOnWrappingFs.wrap(this, path);
   }
 
-  protected GitPathRootShaCachedOnWrappingFs wrap(GitPathRootShaCached path) {
+  protected GitPathRootShaCachedOnWrappingFs wrap(GitPathRootShaCached path) throws IOException,
+      NoSuchFileException {
+    return wrapDoNotThrow(path);
+  }
+
+  protected GitPathRootShaCachedOnWrappingFs wrapDoNotThrow(GitPathRootShaCached path) {
     checkArgument(!path.getFileSystem().equals(this));
     return GitPathRootShaCachedOnWrappingFs.wrap(this, path);
   }
@@ -159,8 +164,7 @@ public class GitWrappingFs extends GitFileSystem {
 
   @Override
   public ImmutableSet<Path> getRootDirectories() throws UncheckedIOException {
-    return IO_UNCHECKER.getUsing(this::graph).nodes().stream().map(p -> wrap(p))
-        .collect(ImmutableSet.toImmutableSet());
+    return ImmutableSet.copyOf(IO_UNCHECKER.getUsing(this::graph).nodes());
   }
 
   @Override

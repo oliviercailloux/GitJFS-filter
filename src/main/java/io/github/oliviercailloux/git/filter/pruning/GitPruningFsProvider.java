@@ -35,12 +35,8 @@ public class GitPruningFsProvider extends GitWrappingFsProvider {
         throws IOException, NoSuchFileException {
       checkArgument(path.getFileSystem() instanceof GitPruningFs);
       verify(path instanceof GitPathOnWrappingFs);
-      GitPruningFs pruningFs = (GitPruningFs) path.getFileSystem();
       GitPathOnWrappingFs gitPath = (GitPathOnWrappingFs) path;
-      GitPathRootShaCachedOnWrappingFs c1 = gitPath.getRoot().toShaCached();
-      pruningFs.throwIfOwnInvisible(c1);
-      GitPathRootShaCached delegate = c1.delegate();
-      return delegate;
+      return gitPath.getRoot().toShaCached().delegate();
     }
 
   @Override

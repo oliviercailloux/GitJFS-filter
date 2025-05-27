@@ -9,6 +9,8 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import io.github.oliviercailloux.git.filter.wrapping.GitPathRootRefOnWrappingFs;
+import io.github.oliviercailloux.git.filter.wrapping.GitPathRootShaCachedOnWrappingFs;
 import io.github.oliviercailloux.git.filter.wrapping.GitWrappingFs;
 import io.github.oliviercailloux.gitjfs.GitPathRoot;
 import io.github.oliviercailloux.gitjfs.GitPathRootRef;
@@ -30,8 +32,9 @@ import org.eclipse.jgit.diff.DiffEntry;
 /*
  * Prunes the graph of commits at given nodes called the invisible starts: all the children of the
  * invisible starts are invisible.<p>This implementation builds the graph once and use it to
- * determine whether a node is invisible (it’s also possible to traverse the DAG but this is
- * inefficient if multiple commits have to be considered).<p>Because doing almost anything useful
+ * determine whether a node is invisible (it’s also possible to traverse the DAG to
+ * determine whether a node is invisible but this is
+ * inefficient if multiple commits have to be considered). Because doing almost anything useful
  * with a commit (such as reading a file) requires to determine whether it is visible, we will most
  * probably have to build the graph, so to simplify implementation, we build it from the start.
  */
@@ -106,10 +109,24 @@ public class GitPruningFs extends GitWrappingFs {
 
   private GitPruningFs(GitWrappingFs delegate, Graph<GitPathRootShaCached> graph) {
     super(delegate);
-    //FIXME consider distinct wrap internally, where we know that the node is visible, and wrap, where we have to check and throw if invisible.
-    this.graph = ImmutableGraph.copyOf(GraphUtils.transform(graph, this::wrap));
+    this.graph = ImmutableGraph.copyOf(GraphUtils.transform(graph, p -> super.wrapDoNotThrow(p)));
   }
 
+  @Override
+  protected GitPathRootShaCachedOnWrappingFs wrap(GitPathRootShaCached path)
+      throws IOException, NoSuchFileException {
+    GitPathRootShaCachedOnWrappingFs wrapped = super.wrap(path);
+    if (graph.nodes().contains(path)) {
+      throw new NoSuchFileException(path.toString());
+    }
+    return wrapped;
+  }
+
+  @Override
+  protected GitPathRootRefOnWrappingFs wrap(GitPathRootRef path) {
+    return GitPathRootRefOnPruningFs.wrap(this, path);
+  }
+  
   @Override
   public ImmutableGraph<GitPathRootShaCached> graph() throws IOException {
     return graph;
@@ -133,8 +150,6 @@ public class GitPruningFs extends GitWrappingFs {
     checkArgument(this.equals(second.getFileSystem()));
     GitPathRootShaCached c1 = first.toShaCached();
     GitPathRootShaCached c2 = second.toShaCached();
-    throwIfOwnInvisible(c1);
-    throwIfOwnInvisible(c2);
     return super.diff(c1, c2);
   }
 
