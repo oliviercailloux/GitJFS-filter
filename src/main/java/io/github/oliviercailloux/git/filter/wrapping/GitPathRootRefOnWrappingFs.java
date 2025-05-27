@@ -1,6 +1,8 @@
 package io.github.oliviercailloux.git.filter.wrapping;
 
 import io.github.oliviercailloux.gitjfs.GitPathRootRef;
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import org.eclipse.jgit.lib.ObjectId;
 
 public class GitPathRootRefOnWrappingFs extends GitPathRootOnWrappingFs implements GitPathRootRef {
@@ -19,6 +21,11 @@ public class GitPathRootRefOnWrappingFs extends GitPathRootOnWrappingFs implemen
   }
 
   @Override
+  public GitPathRootShaOnWrappingFs toSha() throws IOException, NoSuchFileException {
+    return getFileSystem().wrap(delegate().toSha());
+  }
+
+  @Override
   @Deprecated
   public boolean isCommitId() {
     return false;
@@ -34,5 +41,10 @@ public class GitPathRootRefOnWrappingFs extends GitPathRootOnWrappingFs implemen
   @Deprecated
   public boolean isRef() {
     return true;
+  }
+
+  @Override
+  public String getGitRef() {
+    return delegate().getGitRef();
   }
 }

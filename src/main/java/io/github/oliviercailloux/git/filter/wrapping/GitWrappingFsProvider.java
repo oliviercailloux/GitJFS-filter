@@ -54,7 +54,7 @@ public class GitWrappingFsProvider extends GitFileSystemProvider {
     return path;
   }
   
-  GitWrappingFsProvider(GitFileSystemProvider delegate) {
+  protected GitWrappingFsProvider(GitFileSystemProvider delegate) {
     this.delegate = checkNotNull(delegate);
   }
 

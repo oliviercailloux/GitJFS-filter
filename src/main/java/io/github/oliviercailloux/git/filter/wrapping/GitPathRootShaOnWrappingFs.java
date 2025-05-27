@@ -4,6 +4,7 @@ import io.github.oliviercailloux.gitjfs.GitPathRootSha;
 import io.github.oliviercailloux.gitjfs.GitPathRootShaCached;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
+import org.eclipse.jgit.lib.ObjectId;
 
 public class GitPathRootShaOnWrappingFs extends GitPathRootOnWrappingFs implements GitPathRootSha {
 
@@ -35,6 +36,11 @@ public class GitPathRootShaOnWrappingFs extends GitPathRootOnWrappingFs implemen
   @Deprecated
   public boolean isCommitId() {
     return true;
+  }
+
+  @Override
+  public ObjectId getStaticCommitId() {
+    return delegate().getStaticCommitId();
   }
 
   @Override

@@ -60,7 +60,13 @@ public class GitWrappingFs extends GitFileSystem {
 
   protected GitPathRootOnWrappingFs wrap(GitPathRoot path) {
     checkArgument(!path.getFileSystem().equals(this));
-    return GitPathRootOnWrappingFs.wrap(this, path);
+    if(path instanceof GitPathRootRef ref) {
+      return wrap(ref);
+    }
+    if(path instanceof GitPathRootSha sha) {
+      return wrap(sha);
+    }
+    throw new IllegalArgumentException();
   }
 
   protected GitPathRootRefOnWrappingFs wrap(GitPathRootRef path) {

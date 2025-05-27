@@ -18,11 +18,7 @@ import org.eclipse.jgit.lib.ObjectId;
  * <p>
  * When the delegate produces a path, we wrap it. When we receive an existing path (thus produced by this fs), we get the delegate path and pass it to the delegate fs.
  */
-public class GitPathRootOnWrappingFs extends GitPathOnWrappingFs implements GitPathRoot {
-
-  public static GitPathRootOnWrappingFs wrap(GitWrappingFs fs, GitPathRoot delegate) {
-    return new GitPathRootOnWrappingFs(fs, delegate);
-  }
+public abstract class GitPathRootOnWrappingFs extends GitPathOnWrappingFs implements GitPathRoot {
 
   protected GitPathRootOnWrappingFs(GitWrappingFs fs, GitPathRoot delegate) {
     super(fs, delegate);
@@ -34,33 +30,17 @@ public class GitPathRootOnWrappingFs extends GitPathOnWrappingFs implements GitP
   }
 
   @Override
-  public GitPathRootShaOnWrappingFs toSha() throws IOException, NoSuchFileException {
-    return getFileSystem().wrap(delegate().toSha());
-  }
+  public abstract GitPathRootShaOnWrappingFs toSha() throws IOException, NoSuchFileException;
 
   @Override
   public GitPathRootShaCachedOnWrappingFs toShaCached() throws IOException, NoSuchFileException {
-    return getFileSystem().wrap(delegate().toShaCached());
-  }
-
-  @Override
-  public boolean isCommitId() {
-    return delegate().isCommitId();
-  }
-
-  @Override
-  public ObjectId getStaticCommitId() {
-    return delegate().getStaticCommitId();
+    // return getFileSystem().wrap(delegate().toShaCached());
+    return toSha().toShaCached();
   }
 
   @Override
   public boolean isRef() {
     return delegate().isRef();
-  }
-
-  @Override
-  public String getGitRef() {
-    return delegate().getGitRef();
   }
 
   @Override
