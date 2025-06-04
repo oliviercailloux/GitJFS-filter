@@ -82,6 +82,7 @@ public class GitWrappingFs extends GitFileSystem {
   protected GitPathRootShaCachedOnWrappingFs wrap(GitPathRootShaCached path) throws IOException,
       NoSuchFileException {
     return wrapDoNotThrow(path);
+    /* Both versions are needed: one because overrides might require possibility of throwing, one because users of this class might want to call a version that does not throw if it makes sense for them. */
   }
 
   protected GitPathRootShaCachedOnWrappingFs wrapDoNotThrow(GitPathRootShaCached path) {
