@@ -1,22 +1,22 @@
 package io.github.oliviercailloux.git.filter.pruning;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Verify.verify;
 import static io.github.oliviercailloux.jaris.exceptions.Unchecker.IO_UNCHECKER;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.Graphs;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import io.github.oliviercailloux.git.filter.wrapping.GitPathRootRefOnWrappingFs;
 import io.github.oliviercailloux.git.filter.wrapping.GitPathRootShaCachedOnWrappingFs;
-import io.github.oliviercailloux.git.filter.wrapping.GitPathRootShaOnWrappingFs;
 import io.github.oliviercailloux.git.filter.wrapping.GitWrappingFs;
 import io.github.oliviercailloux.gitjfs.GitFileSystem;
 import io.github.oliviercailloux.gitjfs.GitPathRoot;
 import io.github.oliviercailloux.gitjfs.GitPathRootRef;
-import io.github.oliviercailloux.gitjfs.GitPathRootSha;
 import io.github.oliviercailloux.gitjfs.GitPathRootShaCached;
 import io.github.oliviercailloux.gitjfs.IGitFileSystem;
 import io.github.oliviercailloux.jaris.exceptions.CheckedStream;
@@ -35,11 +35,11 @@ import org.eclipse.jgit.diff.DiffEntry;
 /*
  * Prunes the graph of commits at given nodes called the invisible starts: all the children of the
  * invisible starts are invisible.<p>This implementation builds the graph once and use it to
- * determine whether a node is invisible (it’s also possible to traverse the DAG to
- * determine whether a node is invisible but this is
- * inefficient if multiple commits have to be considered). Because doing almost anything useful
- * with a commit (such as reading a file) requires to determine whether it is visible, we will most
- * probably have to build the graph, so to simplify implementation, we build it from the start.
+ * determine whether a node is invisible (it’s also possible to traverse the DAG to determine
+ * whether a node is invisible but this is inefficient if multiple commits have to be considered).
+ * Because doing almost anything useful with a commit (such as reading a file) requires to determine
+ * whether it is visible, we will most probably have to build the graph, so to simplify
+ * implementation, we build it from the start.
  */
 public class GitPruningFs extends GitWrappingFs {
 
@@ -53,54 +53,48 @@ public class GitPruningFs extends GitWrappingFs {
    * Keeps only the nodes that are not the invisible starts or their children (successors)
    * 
    * @param fullGraph a DAG
-   * @param invisibleStarts may contain object ids that are not in the graph
+   * @param invisibleStarts
    * @return
    */
   static Graph<GitPathRootShaCached> pruneGraph(Graph<GitPathRootShaCached> fullGraph,
       Predicate<GitPathRootShaCached> invisibleStarts) {
+    Set<GitPathRootShaCached> visiblesSoFar = new HashSet<>(fullGraph.nodes());
+    Set<GitPathRootShaCached> invisibles = new HashSet<>();
+    Set<GitPathRootShaCached> seen = new HashSet<>();
 
-    Set<GitPathRootShaCached> visited = new HashSet<>();
-    Set<GitPathRootShaCached> invisiblesSoFar = new LinkedHashSet<>();
+    Deque<GitPathRootShaCached> lifo = new ArrayDeque<>();
+
+    fullGraph.nodes().stream().filter(node -> fullGraph.predecessors(node).isEmpty())
+        .forEach(lifo::push);
+
+    while (!lifo.isEmpty()) {
+      GitPathRootShaCached current = lifo.pop();
+
+      if (invisibleStarts.test(current)) {
+        Graphs.reachableNodes(fullGraph, current).forEach(node -> {
+          visiblesSoFar.remove(node);
+          invisibles.add(node);
+        });
+      }
+
+      seen.add(current);
+
+      for (GitPathRootShaCached successor : fullGraph.successors(current)) {
+        if (!seen.contains(successor)) {
+          lifo.push(successor);
+        }
+      }
+    }
+
     MutableGraph<GitPathRootShaCached> prunedGraph = GraphBuilder.from(fullGraph).build();
+    for (GitPathRootShaCached node : visiblesSoFar) {
+      prunedGraph.addNode(node);
+    }
 
-    ImmutableSet<GitPathRootShaCached> roots =
-        fullGraph.nodes().stream().filter(node -> fullGraph.predecessors(node).isEmpty())
-            .collect(ImmutableSet.toImmutableSet());
-
-    /*
-     * We could simplify by having one queue, with pairs (Sha, boolean) to keep context about
-     * visibility of the part. Similarly, we could simplify by enqueing the predecessor together
-     * with the node (thus storing triples)
-     */
-    Deque<GitPathRootShaCached> lifo = new ArrayDeque<>(roots);
-    Deque<GitPathRootShaCached> lifoInvisible = new ArrayDeque<>();
-
-    while (!lifoInvisible.isEmpty() || !lifo.isEmpty()) {
-      GitPathRootShaCached current;
-      boolean visiblePart;
-      if (!lifoInvisible.isEmpty()) {
-        current = lifoInvisible.pop();
-        visiblePart = false;
-      } else {
-        current = lifo.pop();
-        visiblePart = !invisibleStarts.test(current);
-      }
-      if (visited.contains(current) && !prunedGraph.nodes().contains(current)) {
-        continue;
-      }
-      visited.add(current);
-      if (visiblePart) {
-        prunedGraph.addNode(current);
-      } else {
-        invisiblesSoFar.add(current);
-        prunedGraph.removeNode(current);
-      }
-      Deque<GitPathRootShaCached> destination = visiblePart ? lifo : lifoInvisible;
-      for (GitPathRootShaCached successor : ImmutableList.copyOf(fullGraph.successors(current))
-          .reverse()) {
-        destination.push(successor);
-        if (visiblePart) {
-          prunedGraph.putEdge(current, successor);
+    for (GitPathRootShaCached node : visiblesSoFar) {
+      for (GitPathRootShaCached successor : fullGraph.successors(node)) {
+        if (visiblesSoFar.contains(successor)) {
+          prunedGraph.putEdge(node, successor);
         }
       }
     }
