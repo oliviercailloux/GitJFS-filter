@@ -11,6 +11,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.UnmodifiableIterator;
 import com.google.common.graph.ImmutableGraph;
 import io.github.oliviercailloux.git.factory.JGit;
+import io.github.oliviercailloux.git.filter.pruning.GitPruningFs;
 import io.github.oliviercailloux.gitjfs.GitDfsFileSystem;
 import io.github.oliviercailloux.gitjfs.GitFileSystemProvider;
 import io.github.oliviercailloux.gitjfs.GitPathRootSha;
@@ -19,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributeView;
+import java.nio.file.spi.FileSystemProvider;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffEntry.ChangeType;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepository;
@@ -42,12 +44,12 @@ public class GitFilteringFsTests {
           GitFileSystemProvider.instance().newFileSystemFromDfsRepository(repo)) {
         LOGGER.debug("Shas: " + fs.graph().nodes());
 
-        final GitFilteringFs all = GitFilteringFs.filter(fs, c -> true);
+        final GitPruningFs all = GitPruningFs.prune(fs, c -> false);
         final GitPathRootShaCached c0 = all.getPathRoot(commits.get(0)).toShaCached();
         final GitPathRootShaCached c2 = all.getPathRoot(commits.get(2)).toShaCached();
         assertEquals(3, all.graph().nodes().size());
         final GitPathRootShaCached firstNode = all.graph().nodes().iterator().next();
-        assertEquals(c2, firstNode);
+        assertEquals(c0, firstNode);
         assertTrue(Files.exists(c0));
       }
     }
@@ -62,7 +64,7 @@ public class GitFilteringFsTests {
           GitFileSystemProvider.instance().newFileSystemFromDfsRepository(repo)) {
         LOGGER.debug("Shas: " + fs.graph().nodes());
 
-        final GitFilteringFs first = GitFilteringFs.filter(fs, c -> c.id().equals(commits.get(0)));
+        final GitPruningFs first = GitPruningFs.prune(fs, c -> !c.getCommit().id().equals(commits.get(0)));
 
         final GitPathRootShaCached c0 = first.getPathRoot(commits.get(0)).toShaCached();
         assertTrue(Files.exists(c0));
@@ -93,7 +95,7 @@ public class GitFilteringFsTests {
           GitFileSystemProvider.instance().newFileSystemFromDfsRepository(repo)) {
         LOGGER.debug("Shas: " + fs.graph().nodes());
 
-        final GitFilteringFs filtered = GitFilteringFs.filter(fs, c -> c.id().equals(commits.get(0)) || c.id().equals(commits.get(2)));
+        final GitPruningFs filtered = GitPruningFs.prune(fs, c -> !c.getCommit().id().equals(commits.get(0)) && !c.getCommit().id().equals(commits.get(2)));
 
         final GitPathRootShaCached c0 = filtered.getPathRoot(commits.get(0)).toShaCached();
         assertTrue(Files.exists(c0));
@@ -122,15 +124,15 @@ public class GitFilteringFsTests {
           GitFileSystemProvider.instance().newFileSystemFromDfsRepository(repo)) {
         LOGGER.debug("Shas: " + fs.graph().nodes());
 
-        final GitFilteringFs none = GitFilteringFs.filter(fs, c -> c.id().equals(null));
+        final GitPruningFs none = GitPruningFs.prune(fs, c -> !c.getCommit().id().equals(null));
         assertEquals(0, none.graph().nodes().size());
-        final GitFilteringFs first = GitFilteringFs.filter(fs, c -> c.id().equals(commits.get(0)));
+        final GitPruningFs first = GitPruningFs.prune(fs, c -> !c.getCommit().id().equals(commits.get(0)));
         assertEquals(1, first.graph().nodes().size());
         assertEquals(first.getPathRoot(commits.get(0)),
             Iterables.getOnlyElement(first.graph().nodes()));
 
-        final GitFilteringFs middle =
-            GitFilteringFs.filter(fs, c -> !c.id().equals(commits.get(1)));
+        final GitPruningFs middle =
+            GitPruningFs.prune(fs, c -> c.getCommit().id().equals(commits.get(1)));
         final ImmutableGraph<GitPathRootShaCached> graph = middle.graph();
         LOGGER.debug("Middle: {}.", graph);
         assertEquals(2, graph.nodes().size());
@@ -151,7 +153,7 @@ public class GitFilteringFsTests {
       final ImmutableList<ObjectId> commits = JGit.createRepoWithSubDir(repo);
       try (GitDfsFileSystem fs =
           GitFileSystemProvider.instance().newFileSystemFromDfsRepository(repo)) {
-        final GitFilteringFs gitFs = GitFilteringFs.filter(fs, c -> !c.id().equals(commits.get(1)));
+        final GitPruningFs gitFs = GitPruningFs.prune(fs, c -> c.getCommit().id().equals(commits.get(1)));
         final GitPathRootSha p0 = gitFs.getPathRoot(commits.get(0));
         final GitPathRootSha p1 = gitFs.getPathRoot(commits.get(1));
         final GitPathRootSha p2 = gitFs.getPathRoot(commits.get(2));
@@ -184,5 +186,6 @@ public class GitFilteringFsTests {
   @Test
   void testWrapPathWithPathRootAndCheckItsAPathRoot() throws Exception {
     TODO
+    //Also; getParentCommits on a commit that is visible might not work?
   }
 }
