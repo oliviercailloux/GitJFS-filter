@@ -11,9 +11,12 @@ import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import io.github.oliviercailloux.git.filter.wrapping.GitPathRootRefOnWrappingFs;
 import io.github.oliviercailloux.git.filter.wrapping.GitPathRootShaCachedOnWrappingFs;
+import io.github.oliviercailloux.git.filter.wrapping.GitPathRootShaOnWrappingFs;
 import io.github.oliviercailloux.git.filter.wrapping.GitWrappingFs;
+import io.github.oliviercailloux.gitjfs.GitFileSystem;
 import io.github.oliviercailloux.gitjfs.GitPathRoot;
 import io.github.oliviercailloux.gitjfs.GitPathRootRef;
+import io.github.oliviercailloux.gitjfs.GitPathRootSha;
 import io.github.oliviercailloux.gitjfs.GitPathRootShaCached;
 import io.github.oliviercailloux.gitjfs.IGitFileSystem;
 import io.github.oliviercailloux.jaris.exceptions.CheckedStream;
@@ -40,7 +43,7 @@ import org.eclipse.jgit.diff.DiffEntry;
  */
 public class GitPruningFs extends GitWrappingFs {
 
-  public static GitPruningFs prune(GitWrappingFs delegate,
+  public static GitPruningFs prune(GitFileSystem delegate,
       Predicate<GitPathRootShaCached> invisibleStarts) throws IOException {
     ImmutableGraph<GitPathRootShaCached> full = delegate.graph();
     return new GitPruningFs(delegate, pruneGraph(full, invisibleStarts));
@@ -107,7 +110,7 @@ public class GitPruningFs extends GitWrappingFs {
 
   private final ImmutableGraph<GitPathRootShaCached> graph;
 
-  private GitPruningFs(GitWrappingFs delegate, Graph<GitPathRootShaCached> graph) {
+  private GitPruningFs(GitFileSystem delegate, Graph<GitPathRootShaCached> graph) {
     super(delegate);
     this.graph = ImmutableGraph.copyOf(GraphUtils.transform(graph, p -> super.wrapDoNotThrow(p)));
   }
@@ -116,10 +119,15 @@ public class GitPruningFs extends GitWrappingFs {
   protected GitPathRootShaCachedOnWrappingFs wrap(GitPathRootShaCached path)
       throws IOException, NoSuchFileException {
     GitPathRootShaCachedOnWrappingFs wrapped = super.wrap(path);
-    if (graph.nodes().contains(path)) {
-      throw new NoSuchFileException(path.toString());
+    if (!graph.nodes().contains(wrapped)) {
+      throw new NoSuchFileException(wrapped.toString());
     }
     return wrapped;
+  }
+
+  @Override
+  protected GitPathRootShaOnWrappingFs wrap(GitPathRootSha path) {
+    return GitPathRootShaOnPruningFs.wrap(this, path);
   }
 
   @Override
