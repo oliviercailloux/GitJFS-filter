@@ -7,16 +7,16 @@ import static io.github.oliviercailloux.jaris.exceptions.Unchecker.IO_UNCHECKER;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
-import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.Graphs;
 import com.google.common.graph.ImmutableGraph;
-import com.google.common.graph.MutableGraph;
 import io.github.oliviercailloux.git.filter.wrapping.GitPathRootRefOnWrappingFs;
 import io.github.oliviercailloux.git.filter.wrapping.GitPathRootShaCachedOnWrappingFs;
+import io.github.oliviercailloux.git.filter.wrapping.GitPathRootShaOnWrappingFs;
 import io.github.oliviercailloux.git.filter.wrapping.GitWrappingFs;
 import io.github.oliviercailloux.gitjfs.GitFileSystem;
 import io.github.oliviercailloux.gitjfs.GitPathRoot;
 import io.github.oliviercailloux.gitjfs.GitPathRootRef;
+import io.github.oliviercailloux.gitjfs.GitPathRootSha;
 import io.github.oliviercailloux.gitjfs.GitPathRootShaCached;
 import io.github.oliviercailloux.gitjfs.IGitFileSystem;
 import io.github.oliviercailloux.jaris.exceptions.CheckedStream;
@@ -31,6 +31,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.eclipse.jgit.diff.DiffEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * Prunes the graph of commits at given nodes called the invisible starts: all the children of the
@@ -42,6 +44,8 @@ import org.eclipse.jgit.diff.DiffEntry;
  * implementation, we build it from the start.
  */
 public class GitPruningFs extends GitWrappingFs {
+@SuppressWarnings("unused")
+private static final Logger LOGGER = LoggerFactory.getLogger(GitPruningFs.class);
 
   public static GitPruningFs prune(GitFileSystem delegate,
       Predicate<GitPathRootShaCached> invisibleStarts) throws IOException {
@@ -58,12 +62,10 @@ public class GitPruningFs extends GitWrappingFs {
    */
   static Graph<GitPathRootShaCached> pruneGraph(Graph<GitPathRootShaCached> fullGraph,
       Predicate<GitPathRootShaCached> invisibleStarts) {
-    Set<GitPathRootShaCached> visiblesSoFar = new HashSet<>(fullGraph.nodes());
-    Set<GitPathRootShaCached> invisibles = new HashSet<>();
+    Set<GitPathRootShaCached> visiblesSoFar = new LinkedHashSet<>(fullGraph.nodes());
     Set<GitPathRootShaCached> seen = new HashSet<>();
 
     Deque<GitPathRootShaCached> lifo = new ArrayDeque<>();
-
     fullGraph.nodes().stream().filter(node -> fullGraph.predecessors(node).isEmpty())
         .forEach(lifo::push);
 
@@ -71,10 +73,7 @@ public class GitPruningFs extends GitWrappingFs {
       GitPathRootShaCached current = lifo.pop();
 
       if (invisibleStarts.test(current)) {
-        Graphs.reachableNodes(fullGraph, current).forEach(node -> {
-          visiblesSoFar.remove(node);
-          invisibles.add(node);
-        });
+        Graphs.reachableNodes(fullGraph, current).forEach(visiblesSoFar::remove);
       }
 
       seen.add(current);
@@ -86,20 +85,9 @@ public class GitPruningFs extends GitWrappingFs {
       }
     }
 
-    MutableGraph<GitPathRootShaCached> prunedGraph = GraphBuilder.from(fullGraph).build();
-    for (GitPathRootShaCached node : visiblesSoFar) {
-      prunedGraph.addNode(node);
-    }
-
-    for (GitPathRootShaCached node : visiblesSoFar) {
-      for (GitPathRootShaCached successor : fullGraph.successors(node)) {
-        if (visiblesSoFar.contains(successor)) {
-          prunedGraph.putEdge(node, successor);
-        }
-      }
-    }
-
-    return ImmutableGraph.copyOf(prunedGraph);
+    LOGGER.debug("Started with nodes {}, ended with nodes {}.",
+        fullGraph.nodes(), visiblesSoFar);
+    return Graphs.inducedSubgraph(fullGraph, visiblesSoFar);
   }
 
   private final ImmutableGraph<GitPathRootShaCached> graph;

@@ -49,7 +49,7 @@ public class GitFilteringFsTests {
         final GitPathRootShaCached c2 = all.getPathRoot(commits.get(2)).toShaCached();
         assertEquals(3, all.graph().nodes().size());
         final GitPathRootShaCached firstNode = all.graph().nodes().iterator().next();
-        assertEquals(c0, firstNode);
+        assertEquals(c2, firstNode);
         assertTrue(Files.exists(c0));
         assertTrue(Files.exists(c2));
       }
