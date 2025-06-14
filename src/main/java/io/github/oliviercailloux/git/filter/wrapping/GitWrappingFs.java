@@ -20,6 +20,7 @@ import io.github.oliviercailloux.jaris.graphs.GraphUtils;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
+import java.nio.file.ClosedFileSystemException;
 import java.nio.file.FileStore;
 import java.nio.file.InvalidPathException;
 import java.nio.file.NoSuchFileException;
@@ -34,23 +35,32 @@ import org.eclipse.jgit.lib.ObjectId;
 /*
  * A GitFs that delegates to another GitFs except that all the paths created by the delegate are
  * wrapped in order to be associated to this GitFs instead of the delegate. <p> To add multiple
- * traits, each trait extends this class, then create trait 1 with base impl as delegate, then trait 2 with
- * trait 1 as delegate, …
- * <p>
- * When the delegate produces a path, we wrap it. When we receive an existing path (thus produced by this fs), we get the delegate path and pass it to the delegate fs.
+ * traits, each trait extends this class, then create trait 1 with base impl as delegate, then trait
+ * 2 with trait 1 as delegate, … <p> When the delegate produces a path, we wrap it. When we receive
+ * an existing path (thus produced by this fs), we get the delegate path and pass it to the delegate
+ * fs.
  */
 public class GitWrappingFs extends GitFileSystem {
 
   private final GitFileSystem delegate;
   private ImmutableGraph<GitPathRootShaCached> graph;
+  protected boolean open;
 
   protected GitWrappingFs(GitFileSystem delegate) {
     this.delegate = checkNotNull(delegate);
     graph = null;
+    open = true;
   }
 
   protected GitFileSystem delegate() {
     return delegate;
+  }
+
+  protected GitFileSystem delegateIfOpen() {
+    if (open) {
+      return delegate;
+    }
+    throw new ClosedFileSystemException();
   }
 
   protected GitPathOnWrappingFs wrap(GitPath path) {
@@ -60,10 +70,10 @@ public class GitWrappingFs extends GitFileSystem {
 
   protected GitPathRootOnWrappingFs wrap(GitPathRoot path) {
     checkArgument(!path.getFileSystem().equals(this));
-    if(path instanceof GitPathRootRef ref) {
+    if (path instanceof GitPathRootRef ref) {
       return wrap(ref);
     }
-    if(path instanceof GitPathRootSha sha) {
+    if (path instanceof GitPathRootSha sha) {
       return wrap(sha);
     }
     throw new IllegalArgumentException();
@@ -79,10 +89,14 @@ public class GitWrappingFs extends GitFileSystem {
     return GitPathRootShaOnWrappingFs.wrap(this, path);
   }
 
-  protected GitPathRootShaCachedOnWrappingFs wrap(GitPathRootShaCached path) throws IOException,
-      NoSuchFileException {
+  protected GitPathRootShaCachedOnWrappingFs wrap(GitPathRootShaCached path)
+      throws IOException, NoSuchFileException {
     return wrapDoNotThrow(path);
-    /* Both versions are needed: one because overrides might require possibility of throwing, one because users of this class might want to call a version that does not throw if it makes sense for them. */
+    /*
+     * Both versions are needed: one because overrides might require possibility of throwing, one
+     * because users of this class might want to call a version that does not throw if it makes
+     * sense for them.
+     */
   }
 
   protected GitPathRootShaCachedOnWrappingFs wrapDoNotThrow(GitPathRootShaCached path) {
@@ -92,38 +106,38 @@ public class GitWrappingFs extends GitFileSystem {
 
   @Override
   public GitPath getPath(String first, String... more) throws InvalidPathException {
-    final IGitFileSystem iDelegate = delegate();
+    final IGitFileSystem iDelegate = delegateIfOpen();
     return wrap(iDelegate.getPath(first, more));
   }
 
   @Override
   public GitPathRoot getPathRoot(String rootStringForm) throws InvalidPathException {
-    return wrap(delegate().getPathRoot(rootStringForm));
+    return wrap(delegateIfOpen().getPathRoot(rootStringForm));
   }
 
   @Override
   public GitPathRootSha getPathRoot(ObjectId commitId) {
-    return wrap(delegate().getPathRoot(commitId));
+    return wrap(delegateIfOpen().getPathRoot(commitId));
   }
 
   @Override
   public GitPathRootRef getPathRootRef(String rootStringForm) throws InvalidPathException {
-    return wrap(delegate().getPathRootRef(rootStringForm));
+    return wrap(delegateIfOpen().getPathRootRef(rootStringForm));
   }
 
   @Override
   public GitPath getAbsolutePath(String first, String... more) throws InvalidPathException {
-    return wrap(delegate().getAbsolutePath(first, more));
+    return wrap(delegateIfOpen().getAbsolutePath(first, more));
   }
 
   @Override
   public GitPath getAbsolutePath(ObjectId commitId, String internalPath1, String... internalPath) {
-    return wrap(delegate().getAbsolutePath(commitId, internalPath1, internalPath));
+    return wrap(delegateIfOpen().getAbsolutePath(commitId, internalPath1, internalPath));
   }
 
   @Override
   public GitPath getRelativePath(String... names) throws InvalidPathException {
-    return wrap(delegate().getRelativePath(names));
+    return wrap(delegateIfOpen().getRelativePath(names));
   }
 
   protected boolean computedGraph() {
@@ -142,14 +156,15 @@ public class GitWrappingFs extends GitFileSystem {
 
   @Override
   public ImmutableSet<GitPathRootRef> refs() throws IOException {
-    return CheckedStream.<GitPathRootRef, IOException>wrapping(delegate().refs().stream())
+    return CheckedStream.<GitPathRootRef, IOException>wrapping(delegateIfOpen().refs().stream())
         .map(p -> wrap(p)).collect(ImmutableSet.toImmutableSet());
   }
 
   @Override
   public ImmutableSet<DiffEntry> diff(GitPathRoot first, GitPathRoot second)
       throws IOException, NoSuchFileException {
-    return delegate().diff(GitWrappingFsProvider.asGit(first).delegate(), GitWrappingFsProvider.asGit(second).delegate());
+    return delegateIfOpen().diff(GitWrappingFsProvider.asGit(first).delegate(),
+        GitWrappingFsProvider.asGit(second).delegate());
   }
 
   @Override
@@ -159,7 +174,7 @@ public class GitWrappingFs extends GitFileSystem {
 
   @Override
   public GitWrappingFsProvider provider() {
-    final IGitFileSystem iDelegate = delegate();
+    final IGitFileSystem iDelegate = delegateIfOpen();
     return new GitWrappingFsProvider(iDelegate.provider());
   }
 
@@ -170,46 +185,46 @@ public class GitWrappingFs extends GitFileSystem {
 
   @Override
   public Iterable<FileStore> getFileStores() {
-    return delegate().getFileStores();
+    return delegateIfOpen().getFileStores();
   }
 
   @Override
   public PathMatcher getPathMatcher(String syntaxAndPattern) {
-    return delegate().getPathMatcher(syntaxAndPattern);
+    return delegateIfOpen().getPathMatcher(syntaxAndPattern);
   }
 
   @Override
   public String getSeparator() {
-    return delegate().getSeparator();
+    return delegateIfOpen().getSeparator();
   }
 
   @Override
   public UserPrincipalLookupService getUserPrincipalLookupService() {
-    return delegate().getUserPrincipalLookupService();
+    return delegateIfOpen().getUserPrincipalLookupService();
   }
 
   @Override
   public boolean isOpen() {
-    return delegate().isOpen();
+    return delegateIfOpen().isOpen();
   }
 
   @Override
   public boolean isReadOnly() {
-    return delegate().isReadOnly();
+    return delegateIfOpen().isReadOnly();
   }
 
   @Override
   public WatchService newWatchService() throws IOException {
-    return delegate().newWatchService();
+    return delegateIfOpen().newWatchService();
   }
 
   @Override
   public Set<String> supportedFileAttributeViews() {
-    return delegate().supportedFileAttributeViews();
+    return delegateIfOpen().supportedFileAttributeViews();
   }
 
   @Override
   public void close() throws IOException {
-    delegate().close();
+    open = false;
   }
 }

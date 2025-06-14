@@ -37,7 +37,11 @@ final class GitPathRootShaCachedOnFilteredFs extends ForwardingGitPathRootShaCac
   private final GitPathRootShaCached delegate;
 
   private GitPathRootShaCachedOnFilteredFs(GitFilteringFs fs, GitPathRootShaCached delegate) {
-    /* We cannot compute the commit lazily in this class as getCommit may not throw IOE. Thus, we need the fs graph at this stage. However, we cannot check that it is computed right now as we serve as nodes of the graph being possibly built when calling this method. */
+    /*
+     * We cannot compute the commit lazily in this class as getCommit may not throw IOE. Thus, we
+     * need the fs graph at this stage. However, we cannot check that it is computed right now as we
+     * serve as nodes of the graph being possibly built when calling this method.
+     */
     // checkState(fs.computedGraph());
     this.fs = checkNotNull(fs);
     this.delegate = checkNotNull(delegate);
@@ -147,11 +151,11 @@ final class GitPathRootShaCachedOnFilteredFs extends ForwardingGitPathRootShaCac
   public Commit getCommit() {
     final Commit underlying = delegate().getCommit();
     verify(fs.computedGraph());
-    final Set<GitPathRootShaCached> filteredParents = IO_UNCHECKER.getUsing(fs::graph).predecessors(this);
+    final Set<GitPathRootShaCached> filteredParents =
+        IO_UNCHECKER.getUsing(fs::graph).predecessors(this);
     final ImmutableList<ObjectId> filteredParentIds = filteredParents.stream()
         .map(GitPathRootSha::getStaticCommitId).collect(ImmutableList.toImmutableList());
-    return Commit.from(underlying.id(), underlying.authorName(), underlying.authorEmail(), underlying.committerDate(),
-        underlying.committerName(), underlying.committerEmail(), underlying.authorDate(),
+    return Commit.from(underlying.id(), underlying.author(), underlying.committer(),
         filteredParentIds);
   }
 

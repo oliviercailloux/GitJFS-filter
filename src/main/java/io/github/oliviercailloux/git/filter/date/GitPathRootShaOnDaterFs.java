@@ -1,4 +1,4 @@
-package io.github.oliviercailloux.git.filter.pruning;
+package io.github.oliviercailloux.git.filter.date;
 
 import io.github.oliviercailloux.git.filter.wrapping.GitPathRootShaOnWrappingFs;
 import io.github.oliviercailloux.gitjfs.Commit;
@@ -6,13 +6,13 @@ import io.github.oliviercailloux.gitjfs.GitPathRootSha;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 
-class GitPathRootShaOnPruningFs extends GitPathRootShaOnWrappingFs {
+class GitPathRootShaOnDaterFs extends GitPathRootShaOnWrappingFs {
 
-  public static GitPathRootShaOnPruningFs wrap(GitPruningFs fs, GitPathRootSha delegate) {
-    return new GitPathRootShaOnPruningFs(fs, delegate);
+  public static GitPathRootShaOnDaterFs wrap(GitDaterFs fs, GitPathRootSha delegate) {
+    return new GitPathRootShaOnDaterFs(fs, delegate);
   }
 
-  protected GitPathRootShaOnPruningFs(GitPruningFs fs, GitPathRootSha delegate) {
+  protected GitPathRootShaOnDaterFs(GitDaterFs fs, GitPathRootSha delegate) {
     super(fs, delegate);
   }
 

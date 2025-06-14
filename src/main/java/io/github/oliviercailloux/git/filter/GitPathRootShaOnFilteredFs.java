@@ -51,7 +51,7 @@ final class GitPathRootShaOnFilteredFs extends ForwardingGitPathRootSha
     if (!fs.visible(delegateCached.getCommit())) {
       throw new NoSuchFileException(this.toString());
     }
-   
+
     return GitPathRootShaCachedOnFilteredFs.wrap(fs, delegateCached);
   }
 
@@ -160,8 +160,7 @@ final class GitPathRootShaOnFilteredFs extends ForwardingGitPathRootSha
     final Set<GitPathRootShaCached> filteredParents = fs.graph().predecessors(cached);
     final ImmutableList<ObjectId> filteredParentIds = filteredParents.stream()
         .map(GitPathRootSha::getStaticCommitId).collect(ImmutableList.toImmutableList());
-    return Commit.from(underlying.id(), underlying.authorName(), underlying.authorEmail(), underlying.committerDate(),
-        underlying.committerName(), underlying.committerEmail(), underlying.authorDate(),
+    return Commit.from(underlying.id(), underlying.author(), underlying.committer(),
         filteredParentIds);
   }
 
@@ -169,5 +168,4 @@ final class GitPathRootShaOnFilteredFs extends ForwardingGitPathRootSha
   public ImmutableList<GitPathRootSha> getParentCommits() throws IOException, NoSuchFileException {
     return ImmutableList.copyOf(fs.graph().predecessors(toShaCached()));
   }
-  
 }
