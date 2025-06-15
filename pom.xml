@@ -4,12 +4,14 @@
 	<parent>
 		<groupId>io.github.oliviercailloux</groupId>
 		<artifactId>pom</artifactId>
-		<version>0.0.22</version>
+		<version>0.0.25</version>
 	</parent>
 	<name>GitJFS filter</name>
 	<artifactId>gitjfs-filter</artifactId>
 	<version>0.0.5-SNAPSHOT</version>
-	<url>https://github.com/oliviercailloux/GitJFS-filter</url>
+  <properties>
+    <github-repository>GitJFS-filter</github-repository>
+  </properties>
 
 	<dependencies>
 		<dependency>
