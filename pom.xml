@@ -1,49 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>io.github.oliviercailloux</groupId>
-		<artifactId>pom</artifactId>
-		<version>0.0.25</version>
-	</parent>
-	<name>GitJFS filter</name>
-	<artifactId>gitjfs-filter</artifactId>
-	<version>0.0.5-SNAPSHOT</version>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>io.github.oliviercailloux</groupId>
+    <artifactId>pom</artifactId>
+    <version>0.0.25</version>
+  </parent>
+  <name>GitJFS filter</name>
+  <artifactId>gitjfs-filter</artifactId>
+  <version>0.0.5-SNAPSHOT</version>
   <properties>
     <github-repository>GitJFS-filter</github-repository>
   </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>io.github.oliviercailloux</groupId>
-			<artifactId>jaris</artifactId>
-			<version>0.0.39</version>
-		</dependency>
-		<dependency>
-			<groupId>io.github.oliviercailloux</groupId>
-			<artifactId>gitjfs</artifactId>
-			<version>0.0.7</version>
-		</dependency>
-		<dependency>
-			<groupId>io.github.oliviercailloux</groupId>
-			<artifactId>git-factory</artifactId>
-			<version>0.0.5</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jgrapht</groupId>
-			<artifactId>jgrapht-core</artifactId>
-			<version>1.5.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jgrapht</groupId>
-			<artifactId>jgrapht-guava</artifactId>
-			<version>1.5.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>5.8.0</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>io.github.oliviercailloux</groupId>
+      <artifactId>jaris</artifactId>
+      <version>0.0.39</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.oliviercailloux</groupId>
+      <artifactId>gitjfs</artifactId>
+      <version>0.0.7</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.oliviercailloux</groupId>
+      <artifactId>git-factory</artifactId>
+      <version>0.0.5</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jgrapht</groupId>
+      <artifactId>jgrapht-core</artifactId>
+      <version>1.5.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jgrapht</groupId>
+      <artifactId>jgrapht-guava</artifactId>
+      <version>1.5.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>5.8.0</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>
