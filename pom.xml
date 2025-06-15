@@ -27,11 +27,6 @@
       <version>0.0.7</version>
     </dependency>
     <dependency>
-      <groupId>io.github.oliviercailloux</groupId>
-      <artifactId>git-factory</artifactId>
-      <version>0.0.5</version>
-    </dependency>
-    <dependency>
       <groupId>org.jgrapht</groupId>
       <artifactId>jgrapht-core</artifactId>
       <version>1.5.2</version>
@@ -40,6 +35,13 @@
       <groupId>org.jgrapht</groupId>
       <artifactId>jgrapht-guava</artifactId>
       <version>1.5.2</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>io.github.oliviercailloux</groupId>
+      <artifactId>git-factory</artifactId>
+      <version>0.0.6-SNAPSHOT</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
