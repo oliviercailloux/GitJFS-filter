@@ -23,7 +23,6 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
 import java.util.Map;
 import java.util.Set;
-import org.checkerframework.checker.units.qual.A;
 
 public class GitPruningFsProvider extends GitWrappingFsProvider {
 
@@ -78,7 +77,7 @@ public class GitPruningFsProvider extends GitWrappingFsProvider {
   }
 
   @Override
-  public <B extends BasicFileAttributes> B readAttributes(Path path, Class<B> type,
+  public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type,
       LinkOption... options) throws IOException {
     return delegate().readAttributes(asVisibleDelegate(path), type, options);
   }

@@ -29,7 +29,6 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
 import java.util.Map;
 import java.util.Set;
-import org.checkerframework.checker.units.qual.A;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepository;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Repository;
@@ -168,7 +167,7 @@ public class GitWrappingFsProvider extends GitFileSystemProvider {
   }
 
   @Override
-  public <B extends BasicFileAttributes> B readAttributes(Path path, Class<B> type,
+  public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type,
       LinkOption... options) throws IOException {
     return delegate().readAttributes(asGit(path).delegate(), type, options);
   }
