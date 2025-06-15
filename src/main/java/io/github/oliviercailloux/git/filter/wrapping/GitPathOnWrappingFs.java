@@ -15,12 +15,12 @@ import java.nio.file.WatchService;
 import java.util.Objects;
 
 /*
- * A GitPath linked to a GitWrappingFs, that delegates to another GitPath, except that all the paths created by the delegate are
- * wrapped by the linked FS, in order to be associated to the linked FS.
- * <p>
- * When the delegate produces a path, we wrap it. When we receive an existing path produced by this FS, we get the delegate path and pass it to the delegate FS.
+ * A GitPath linked to a GitWrappingFs, that delegates to another GitPath, except that all the paths
+ * created by the delegate are wrapped by the linked FS, in order to be associated to the linked FS.
+ * <p> When the delegate produces a path, we wrap it. When we receive an existing path produced by
+ * this FS, we get the delegate path and pass it to the delegate FS.
  */
-public class GitPathOnWrappingFs implements GitPath{
+public class GitPathOnWrappingFs implements GitPath {
 
   public static GitPathOnWrappingFs wrap(GitWrappingFs fs, GitPath delegate) {
     return new GitPathOnWrappingFs(fs, delegate);
@@ -45,7 +45,8 @@ public class GitPathOnWrappingFs implements GitPath{
 
   @Override
   public GitPathOnWrappingFs toAbsolutePath() {
-    return delegate.toAbsolutePath().equals(delegate) ? this : getFileSystem().wrap(delegate.toAbsolutePath());
+    return delegate.toAbsolutePath().equals(delegate) ? this
+        : getFileSystem().wrap(delegate.toAbsolutePath());
   }
 
   @Override
@@ -57,7 +58,7 @@ public class GitPathOnWrappingFs implements GitPath{
   public int getNameCount() {
     return delegate.getNameCount();
   }
-  
+
   @Override
   public GitPathOnWrappingFs getFileName() {
     return getFileSystem().wrap(delegate.getFileName());
@@ -90,7 +91,8 @@ public class GitPathOnWrappingFs implements GitPath{
 
   @Override
   public GitPathOnWrappingFs relativize(Path other) {
-    return getFileSystem().wrap(delegate.relativize(GitWrappingFsProvider.delegateOrOriginal(other)));
+    return getFileSystem()
+        .wrap(delegate.relativize(GitWrappingFsProvider.delegateOrOriginal(other)));
   }
 
   @Override
@@ -148,5 +150,4 @@ public class GitPathOnWrappingFs implements GitPath{
   public int compareTo(Path other) {
     return delegate.compareTo(GitWrappingFsProvider.delegateOrOriginal(other));
   }
-  
 }
