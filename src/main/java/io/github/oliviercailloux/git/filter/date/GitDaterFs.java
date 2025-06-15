@@ -1,5 +1,7 @@
 package io.github.oliviercailloux.git.filter.date;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.graph.ImmutableGraph;
 import io.github.oliviercailloux.git.filter.pruning.GitPruningFs;
 import io.github.oliviercailloux.git.filter.wrapping.GitPathRootShaCachedOnWrappingFs;
@@ -24,12 +26,12 @@ public class GitDaterFs extends GitWrappingFs {
 
   private GitDaterFs(GitFileSystem delegate, Function<GitPathRootShaCached, CommitDates> dateFunction) {
     super(delegate);
-    this.dateFunction = dateFunction;
+    this.dateFunction = checkNotNull(dateFunction);
   }
 
   @Override
   protected GitPathRootShaCachedOnWrappingFs wrap(GitPathRootShaCached path)
       throws IOException, NoSuchFileException {
-    return GitPathRootShaCachedOnDaterFs.wrap(this, path, dateFunction.apply(path));
+    return GitPathRootShaCachedOnDaterFs.wrap(this, path, dateFunction.apply(checkNotNull(path)));
   }
 }
