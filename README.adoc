@@ -1,0 +1,17 @@
+= GitJFS filter
+:groupId: io.github.oliviercailloux
+:artifactId: gitjfs-filter
+:repository: GitJFS-filter
+
+image:https://github.com/oliviercailloux/{artifactId}/workflows/Maven%20CI%20workflow/badge.svg["Maven CI", link="https://github.com/oliviercailloux/{repository}/actions"]
+image:https://maven-badges.herokuapp.com/maven-central/{groupId}/{artifactId}/badge.svg["Artifact on Maven Central", link="https://central.sonatype.com/artifact/{groupId}/{artifactId}"]
+image:http://www.javadoc.io/badge/{groupId}/{artifactId}.svg["Javadocs", link="http://www.javadoc.io/doc/{groupId}/{artifactId}"]
+
+Decorators for Git file systems.
+
+== Decorators for end users
+- `GitPruningFs.prune(delegate, predicate)`: Given a GitFileSystem, returns a GitFileSystem with a pruned DAG of commits: those that satisfy the given predicate/home/olivier/Local/Nextcloud LAMSADE/Professions/Enseignement/Java & HTML/JARiS/.github are removed from the DAG, and their children as well.
+- `GitDaterFs.date(delegate, dater)`: Given a GitFileSystem, returns a GitFileSystem that changes the commit dates according to the `dater` function.
+
+== Helper decorator
+Package `io.github.oliviercailloux.gitjfs.wrapping` provides a decorator that can be used as a basis for implementing other decorators.
