@@ -40,7 +40,7 @@
     <dependency>
       <groupId>io.github.oliviercailloux</groupId>
       <artifactId>git-factory</artifactId>
-      <version>0.0.6-SNAPSHOT</version>
+      <version>0.0.6</version>
       <scope>test</scope>
     </dependency>
     <dependency>
