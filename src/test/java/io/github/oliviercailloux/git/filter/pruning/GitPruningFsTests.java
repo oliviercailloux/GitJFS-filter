@@ -100,9 +100,9 @@ public class GitPruningFsTests {
             .map(p -> p.getCommit().id()).collect(ImmutableList.toImmutableList());
         assertEquals(3, commits.size());
         /* i2 the most recent (most rightwards) */
-        ObjectId i2 = commits.get(0);
-        ObjectId i1 = commits.get(1);
-        ObjectId i0 = commits.get(2);
+        final ObjectId i2 = commits.get(0);
+        final ObjectId i1 = commits.get(1);
+        final ObjectId i0 = commits.get(2);
         LOGGER.debug("Shas: " + underlying.graph().nodes());
         final GitPathRootShaCached u0 = underlying.getPathRoot(i0).toShaCached();
         assertEquals(ImmutableSet.of(), underlying.graph().predecessors(u0));

@@ -4,7 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.time.ZonedDateTime;
 
-public record CommitDates(ZonedDateTime authorDate, ZonedDateTime committerDate) {
+public record CommitDates (ZonedDateTime authorDate, ZonedDateTime committerDate) {
   /**
    * Returns a new instance of {@code CommitDates} with no dates.
    *
@@ -16,19 +16,18 @@ public record CommitDates(ZonedDateTime authorDate, ZonedDateTime committerDate)
 
   /**
    * Returns a new instance of {@code CommitDates} with the given date.
-   * *
+   *
    * @param date the date to be used for both author and committer dates
    * @return a new {@code CommitDates} instance with the same date for both author and committer
    */
   public static CommitDates given(ZonedDateTime date) {
     return new CommitDates(checkNotNull(date), date);
   }
-  
+
   /**
-   * Returns a new instance of {@code CommitDates} with the specified author and
-   * committer dates.
+   * Returns a new instance of {@code CommitDates} with the specified author and committer dates.
    *
-   * @param authorDate    the date when the commit was authored
+   * @param authorDate the date when the commit was authored
    * @param committerDate the date when the commit was committed
    * @return a new {@code CommitDates} instance
    */
@@ -37,8 +36,8 @@ public record CommitDates(ZonedDateTime authorDate, ZonedDateTime committerDate)
   }
 
   /**
-   * Returns a new instance of {@code CommitDates} with the specified author date.
-   * *
+   * Returns a new instance of {@code CommitDates} with the specified author date. *
+   *
    * @param authorDate the date when the commit was authored
    * @return a new {@code CommitDates} instance with the specified author date and no committer date
    */
@@ -47,8 +46,8 @@ public record CommitDates(ZonedDateTime authorDate, ZonedDateTime committerDate)
   }
 
   /**
-   * Returns a new instance of {@code CommitDates} with the specified committer date.
-   * *
+   * Returns a new instance of {@code CommitDates} with the specified committer date. *
+   *
    * @param committerDate the date when the commit was committed
    * @return a new {@code CommitDates} instance with the specified committer date and no author date
    */

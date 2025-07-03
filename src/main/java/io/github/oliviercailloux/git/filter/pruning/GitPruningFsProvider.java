@@ -4,7 +4,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Verify.verify;
 
 import io.github.oliviercailloux.git.filter.wrapping.GitPathOnWrappingFs;
-import io.github.oliviercailloux.git.filter.wrapping.GitPathRootShaCachedOnWrappingFs;
 import io.github.oliviercailloux.git.filter.wrapping.GitWrappingFsProvider;
 import io.github.oliviercailloux.gitjfs.GitFileSystemProvider;
 import io.github.oliviercailloux.gitjfs.GitPathRootShaCached;
@@ -12,12 +11,12 @@ import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.AccessMode;
 import java.nio.file.DirectoryStream;
+import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.FileStore;
 import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
@@ -29,14 +28,13 @@ public class GitPruningFsProvider extends GitWrappingFsProvider {
   GitPruningFsProvider(GitFileSystemProvider delegate) {
     super(delegate);
   }
-  
-    GitPathRootShaCached asVisibleDelegate(Path path)
-        throws IOException, NoSuchFileException {
-      checkArgument(path.getFileSystem() instanceof GitPruningFs);
-      verify(path instanceof GitPathOnWrappingFs);
-      GitPathOnWrappingFs gitPath = (GitPathOnWrappingFs) path;
-      return gitPath.getRoot().toShaCached().delegate();
-    }
+
+  GitPathRootShaCached asVisibleDelegate(Path path) throws IOException, NoSuchFileException {
+    checkArgument(path.getFileSystem() instanceof GitPruningFs);
+    verify(path instanceof GitPathOnWrappingFs);
+    GitPathOnWrappingFs gitPath = (GitPathOnWrappingFs) path;
+    return gitPath.getRoot().toShaCached().delegate();
+  }
 
   @Override
   public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options,

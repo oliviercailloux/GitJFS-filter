@@ -55,9 +55,9 @@ public class GitDaterFsTests {
         Set<GitPathRootShaCached> nodes = underlying.graph().nodes();
         Iterator<GitPathRootShaCached> iterator = nodes.iterator();
         assertTrue(iterator.hasNext());
-        GitPathRootShaCached u1 = iterator.next();
+        final GitPathRootShaCached u1 = iterator.next();
         assertTrue(iterator.hasNext());
-        GitPathRootShaCached u2 = iterator.next();
+        final GitPathRootShaCached u2 = iterator.next();
         assertTrue(iterator.hasNext());
         final GitPathRootShaCached u3 = iterator.next();
         assertEquals(3, underlying.graph().nodes().size());

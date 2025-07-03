@@ -18,13 +18,14 @@ import java.util.function.Predicate;
 public class GitDaterFs extends GitWrappingFs {
 
   public static GitDaterFs date(GitFileSystem delegate,
-  Function<GitPathRootShaCached, CommitDates> dateFunction)  {
+      Function<GitPathRootShaCached, CommitDates> dateFunction) {
     return new GitDaterFs(delegate, dateFunction);
   }
 
   private final Function<GitPathRootShaCached, CommitDates> dateFunction;
 
-  private GitDaterFs(GitFileSystem delegate, Function<GitPathRootShaCached, CommitDates> dateFunction) {
+  private GitDaterFs(GitFileSystem delegate,
+      Function<GitPathRootShaCached, CommitDates> dateFunction) {
     super(delegate);
     this.dateFunction = checkNotNull(dateFunction);
   }

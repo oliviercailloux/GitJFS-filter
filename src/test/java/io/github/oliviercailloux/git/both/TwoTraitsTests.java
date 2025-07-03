@@ -91,8 +91,8 @@ public class TwoTraitsTests {
             CommitDates.given(now), i1, CommitDates.givenAuthorDate(now), i2, CommitDates.none());
         try (GitFileSystem dated =
             GitDaterFs.date(underlying, p -> fakeDates.get(p.getStaticCommitId()))) {
-        try (GitPruningFs twoTraits =
-            GitPruningFs.prune(dated, c -> c.getCommit().id().equals(i2))) {
+          try (GitPruningFs twoTraits =
+              GitPruningFs.prune(dated, c -> c.getCommit().id().equals(i2))) {
             final ImmutableGraph<GitPathRootShaCached> graph = twoTraits.graph();
             LOGGER.debug("Middle: {}.", graph);
             assertEquals(2, graph.nodes().size());

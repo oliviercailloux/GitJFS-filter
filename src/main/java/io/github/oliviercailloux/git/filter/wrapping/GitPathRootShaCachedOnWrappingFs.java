@@ -3,9 +3,11 @@ package io.github.oliviercailloux.git.filter.wrapping;
 import io.github.oliviercailloux.gitjfs.Commit;
 import io.github.oliviercailloux.gitjfs.GitPathRootShaCached;
 
-public class GitPathRootShaCachedOnWrappingFs extends GitPathRootShaOnWrappingFs implements GitPathRootShaCached {
+public class GitPathRootShaCachedOnWrappingFs extends GitPathRootShaOnWrappingFs
+    implements GitPathRootShaCached {
 
-  public static GitPathRootShaCachedOnWrappingFs wrap(GitWrappingFs fs, GitPathRootShaCached delegate) {
+  public static GitPathRootShaCachedOnWrappingFs wrap(GitWrappingFs fs,
+      GitPathRootShaCached delegate) {
     return new GitPathRootShaCachedOnWrappingFs(fs, delegate);
   }
 

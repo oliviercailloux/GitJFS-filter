@@ -44,8 +44,8 @@ import org.slf4j.LoggerFactory;
  * implementation, we build it from the start.
  */
 public class GitPruningFs extends GitWrappingFs {
-@SuppressWarnings("unused")
-private static final Logger LOGGER = LoggerFactory.getLogger(GitPruningFs.class);
+  @SuppressWarnings("unused")
+  private static final Logger LOGGER = LoggerFactory.getLogger(GitPruningFs.class);
 
   public static GitPruningFs prune(GitFileSystem delegate,
       Predicate<GitPathRootShaCached> invisibleStarts) throws IOException {
@@ -55,7 +55,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(GitPruningFs.class)
 
   /**
    * Keeps only the nodes that are not the invisible starts or their children (successors)
-   * 
+   *
    * @param fullGraph a DAG
    * @param invisibleStarts
    * @return
@@ -85,8 +85,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(GitPruningFs.class)
       }
     }
 
-    LOGGER.debug("Started with nodes {}, ended with nodes {}.",
-        fullGraph.nodes(), visiblesSoFar);
+    LOGGER.debug("Started with nodes {}, ended with nodes {}.", fullGraph.nodes(), visiblesSoFar);
     return Graphs.inducedSubgraph(fullGraph, visiblesSoFar);
   }
 
@@ -116,7 +115,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(GitPruningFs.class)
   protected GitPathRootRefOnWrappingFs wrap(GitPathRootRef path) {
     return GitPathRootRefOnPruningFs.wrap(this, path);
   }
-  
+
   @Override
   public ImmutableGraph<GitPathRootShaCached> graph() throws IOException {
     return graph;

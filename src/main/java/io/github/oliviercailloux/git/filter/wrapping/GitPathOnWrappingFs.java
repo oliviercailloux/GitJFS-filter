@@ -90,6 +90,11 @@ public class GitPathOnWrappingFs implements GitPath {
   }
 
   @Override
+  public GitPath resolve(String other) {
+    return getFileSystem().wrap(delegate.resolve(other));
+  }
+
+  @Override
   public GitPathOnWrappingFs relativize(Path other) {
     return getFileSystem()
         .wrap(delegate.relativize(GitWrappingFsProvider.delegateOrOriginal(other)));
@@ -134,11 +139,6 @@ public class GitPathOnWrappingFs implements GitPath {
   @Override
   public boolean endsWith(Path other) {
     return delegate.endsWith(GitWrappingFsProvider.delegateOrOriginal(other));
-  }
-
-  @Override
-  public GitPath resolve(String other) {
-    return getFileSystem().wrap(delegate.resolve(other));
   }
 
   @Override

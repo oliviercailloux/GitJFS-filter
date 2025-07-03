@@ -29,7 +29,7 @@ public class GitPathRootShaCachedOnDaterFs extends GitPathRootShaCachedOnWrappin
   }
 
   private CommitSignature toSignature(CommitSignature original, ZonedDateTime override) {
-    if(override == null) {
+    if (override == null) {
       return original;
     }
     return CommitSignature.from(original.name(), original.email(), override);

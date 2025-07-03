@@ -13,10 +13,10 @@ import java.nio.file.NoSuchFileException;
 import org.eclipse.jgit.lib.ObjectId;
 
 /*
- * A GitPathRoot linked to a GitWrappingFs, that delegates to another GitPathRoot, except that all the paths created by the delegate are
- * wrapped by the linked FS, in order to be associated to the linked FS.
- * <p>
- * When the delegate produces a path, we wrap it. When we receive an existing path (thus produced by this fs), we get the delegate path and pass it to the delegate fs.
+ * A GitPathRoot linked to a GitWrappingFs, that delegates to another GitPathRoot, except that all
+ * the paths created by the delegate are wrapped by the linked FS, in order to be associated to the
+ * linked FS. <p> When the delegate produces a path, we wrap it. When we receive an existing path
+ * (thus produced by this fs), we get the delegate path and pass it to the delegate fs.
  */
 public abstract class GitPathRootOnWrappingFs extends GitPathOnWrappingFs implements GitPathRoot {
 
@@ -50,8 +50,7 @@ public abstract class GitPathRootOnWrappingFs extends GitPathOnWrappingFs implem
 
   @Override
   public ImmutableList<GitPathRootSha> getParentCommits() throws IOException, NoSuchFileException {
-    return delegate().getParentCommits().stream()
-        .map(p -> getFileSystem().wrap(p))
+    return delegate().getParentCommits().stream().map(p -> getFileSystem().wrap(p))
         .collect(ImmutableList.toImmutableList());
   }
 
