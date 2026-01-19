@@ -28,6 +28,17 @@
       <version>0.0.8-SNAPSHOT</version>
     </dependency>
     <dependency>
+      <groupId>io.github.oliviercailloux.git</groupId>
+      <artifactId>git-common</artifactId>
+      <version>0.0.6-SNAPSHOT</version>
+    </dependency>
+    <!-- For GitFilteringFs -->
+    <dependency>
+      <groupId>org.eclipse.jgit</groupId>
+      <artifactId>org.eclipse.jgit</artifactId>
+      <version>7.3.0.202506031305-r</version>
+    </dependency>
+    <dependency>
       <groupId>org.jgrapht</groupId>
       <artifactId>jgrapht-core</artifactId>
       <version>1.5.2</version>
