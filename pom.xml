@@ -6,9 +6,10 @@
   <parent>
     <groupId>io.github.oliviercailloux</groupId>
     <artifactId>pom</artifactId>
-    <version>0.0.25</version>
+    <version>0.0.30</version>
   </parent>
   <name>GitJFS filter</name>
+  <groupId>io.github.oliviercailloux.git</groupId>
   <artifactId>gitjfs-filter</artifactId>
   <version>0.0.5-SNAPSHOT</version>
   <properties>
@@ -19,10 +20,10 @@
     <dependency>
       <groupId>io.github.oliviercailloux</groupId>
       <artifactId>jaris</artifactId>
-      <version>0.0.39</version>
+      <version>0.0.42</version>
     </dependency>
     <dependency>
-      <groupId>io.github.oliviercailloux</groupId>
+      <groupId>io.github.oliviercailloux.git</groupId>
       <artifactId>gitjfs</artifactId>
       <version>0.0.8-SNAPSHOT</version>
     </dependency>
@@ -38,9 +39,9 @@
     </dependency>
     
     <dependency>
-      <groupId>io.github.oliviercailloux</groupId>
+      <groupId>io.github.oliviercailloux.git</groupId>
       <artifactId>git-factory</artifactId>
-      <version>0.0.6</version>
+      <version>0.0.8-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
