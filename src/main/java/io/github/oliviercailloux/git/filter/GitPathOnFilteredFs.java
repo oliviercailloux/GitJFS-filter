@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import io.github.oliviercailloux.gitjfs.ForwardingGitPath;
 import io.github.oliviercailloux.gitjfs.GitPath;
+import io.github.oliviercailloux.gitjfs.GitPathRoot;
 import java.io.IOException;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -70,7 +71,11 @@ final class GitPathOnFilteredFs extends ForwardingGitPath implements IGitPathOnF
 
   @Override
   public GitPathRootOnFilteredFs getRoot() {
-    return GitPathRootOnFilteredFs.wrap(fs, delegate.getRoot());
+    GitPathRoot root = delegate.getRoot();
+    if (root == null) {
+      return null;
+    }
+    return GitPathRootOnFilteredFs.wrap(fs, root);
   }
 
   @Override
