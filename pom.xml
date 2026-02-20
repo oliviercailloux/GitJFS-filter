@@ -25,7 +25,7 @@
     <dependency>
       <groupId>io.github.oliviercailloux.git</groupId>
       <artifactId>gitjfs</artifactId>
-      <version>0.0.8-SNAPSHOT</version>
+      <version>0.0.8</version>
     </dependency>
     <!-- For GitFilteringFs -->
     <dependency>
@@ -46,14 +46,14 @@
     
     <dependency>
       <groupId>io.github.oliviercailloux.git</groupId>
-      <artifactId>git-factory</artifactId>
-      <version>0.0.8-SNAPSHOT</version>
+      <artifactId>git-common</artifactId>
+      <version>0.0.5</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.github.oliviercailloux.git</groupId>
-      <artifactId>git-common</artifactId>
-      <version>0.0.6-SNAPSHOT</version>
+      <artifactId>git-factory</artifactId>
+      <version>0.0.7</version>
       <scope>test</scope>
     </dependency>
     <dependency>
