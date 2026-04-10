@@ -39,7 +39,7 @@ public class GitPathOnWrappingFs implements GitPath {
     return fs;
   }
 
-  public GitPath delegate() {
+  GitPath delegate() {
     return delegate;
   }
 

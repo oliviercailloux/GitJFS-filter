@@ -25,7 +25,7 @@ public abstract class GitPathRootOnWrappingFs extends GitPathOnWrappingFs implem
   }
 
   @Override
-  public GitPathRoot delegate() {
+  GitPathRoot delegate() {
     return (GitPathRoot) super.delegate();
   }
 

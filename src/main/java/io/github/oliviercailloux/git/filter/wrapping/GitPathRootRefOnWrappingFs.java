@@ -16,7 +16,7 @@ public class GitPathRootRefOnWrappingFs extends GitPathRootOnWrappingFs implemen
   }
 
   @Override
-  public GitPathRootRef delegate() {
+  GitPathRootRef delegate() {
     return (GitPathRootRef) super.delegate();
   }
 
