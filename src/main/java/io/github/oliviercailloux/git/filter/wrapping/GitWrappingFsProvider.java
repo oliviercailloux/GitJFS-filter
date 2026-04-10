@@ -9,8 +9,6 @@ import io.github.oliviercailloux.gitjfs.GitFileSystem;
 import io.github.oliviercailloux.gitjfs.GitFileSystemProvider;
 import io.github.oliviercailloux.gitjfs.GitPath;
 import io.github.oliviercailloux.gitjfs.GitPathRoot;
-import io.github.oliviercailloux.gitjfs.IGitDfsFileSystem;
-import io.github.oliviercailloux.gitjfs.IGitFileFileSystem;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
@@ -98,13 +96,13 @@ public class GitWrappingFsProvider extends GitFileSystemProvider {
   }
 
   @Override
-  public IGitFileFileSystem getFileSystemFromGitDir(Path gitDir)
+  public GitFileFileSystem getFileSystemFromGitDir(Path gitDir)
       throws FileSystemNotFoundException {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public IGitDfsFileSystem getFileSystemFromRepositoryName(String name)
+  public GitDfsFileSystem getFileSystemFromRepositoryName(String name)
       throws FileSystemNotFoundException {
     throw new UnsupportedOperationException();
   }
