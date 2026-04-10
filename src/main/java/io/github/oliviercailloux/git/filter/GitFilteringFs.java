@@ -180,7 +180,7 @@ public class GitFilteringFs extends ForwardingGitFileSystem {
 
   @Override
   public GitFilteringFsProvider provider() {
-    final IGitFileSystem iDelegate = delegate;
+    final GitFileSystem iDelegate = delegate;
     return new GitFilteringFsProvider(iDelegate.provider());
   }
 }

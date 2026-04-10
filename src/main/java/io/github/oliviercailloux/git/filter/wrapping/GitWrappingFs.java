@@ -106,7 +106,7 @@ public class GitWrappingFs extends GitFileSystem {
 
   @Override
   public GitPath getPath(String first, String... more) throws InvalidPathException {
-    final IGitFileSystem iDelegate = delegateIfOpen();
+    final GitFileSystem iDelegate = delegateIfOpen();
     return wrap(iDelegate.getPath(first, more));
   }
 
@@ -174,7 +174,7 @@ public class GitWrappingFs extends GitFileSystem {
 
   @Override
   public GitWrappingFsProvider provider() {
-    final IGitFileSystem iDelegate = delegateIfOpen();
+    final GitFileSystem iDelegate = delegateIfOpen();
     return new GitWrappingFsProvider(iDelegate.provider());
   }
 

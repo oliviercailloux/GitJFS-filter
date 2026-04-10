@@ -150,7 +150,7 @@ public class GitPruningFs extends GitWrappingFs {
 
   @Override
   public GitPruningFsProvider provider() {
-    final IGitFileSystem iDelegate = delegate();
+    final GitFileSystem iDelegate = delegate();
     return new GitPruningFsProvider(iDelegate.provider());
   }
 }
