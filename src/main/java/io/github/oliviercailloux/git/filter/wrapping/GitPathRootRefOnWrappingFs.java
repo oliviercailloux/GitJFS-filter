@@ -1,6 +1,8 @@
 package io.github.oliviercailloux.git.filter.wrapping;
 
+import com.google.common.collect.ImmutableList;
 import io.github.oliviercailloux.gitjfs.GitPathRootRef;
+import io.github.oliviercailloux.gitjfs.GitPathSha;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import org.eclipse.jgit.lib.ObjectId;

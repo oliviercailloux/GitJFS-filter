@@ -2,19 +2,26 @@ package io.github.oliviercailloux.git.filter;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
+import io.github.oliviercailloux.gitjfs.Commit;
 import io.github.oliviercailloux.gitjfs.ForwardingGitPath;
 import io.github.oliviercailloux.gitjfs.GitPath;
 import io.github.oliviercailloux.gitjfs.GitPathRoot;
+import io.github.oliviercailloux.gitjfs.GitPathRootSha;
+import io.github.oliviercailloux.gitjfs.GitPathSha;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Objects;
+import org.eclipse.jgit.api.Git;
 
 /**
  * Similar to a GitPath (which it wraps and delegates to) except linked to a filteredFs.
  */
 @Deprecated
-final class GitPathOnFilteredFs extends ForwardingGitPath implements IGitPathOnFilteredFs {
+sealed class GitPathOnFilteredFs extends ForwardingGitPath implements IGitPathOnFilteredFs permits GitPathShaOnFilteredFs, GitPathRefOnFilteredFs {
 
   static GitPathOnFilteredFs wrap(GitFilteringFs fs, GitPath delegate) {
     return new GitPathOnFilteredFs(fs, delegate);
@@ -25,7 +32,7 @@ final class GitPathOnFilteredFs extends ForwardingGitPath implements IGitPathOnF
 
   private GitPathOnFilteredFs absolute;
 
-  private GitPathOnFilteredFs(GitFilteringFs fs, GitPath delegate) {
+  GitPathOnFilteredFs(GitFilteringFs fs, GitPath delegate) {
     this.fs = checkNotNull(fs);
     this.delegate = checkNotNull(delegate);
     absolute = null;
@@ -116,5 +123,26 @@ final class GitPathOnFilteredFs extends ForwardingGitPath implements IGitPathOnF
   @Override
   public GitPathOnFilteredFs toRealPath(LinkOption... options) throws IOException {
     return newWrapper(delegate.toRealPath(options));
+  }
+
+  @Override
+  public ImmutableList<GitPathRootSha> getParentCommits() throws NoSuchFileException, IOException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public ImmutableList<GitPathSha> getParentShas() throws IOException, NoSuchFileException {
+    return delegate.getParentShas().stream().filter(p -> {
+      try {
+        return fs.visible(p.toShaPath().getCommit());
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+    }).map(p -> GitPathShaOnFilteredFs.wrap(fs, p)).collect(ImmutableList.toImmutableList());
+  }
+
+  @Override
+  public GitPathSha toShaPath() throws IOException, NoSuchFileException {
+    return GitPathShaOnFilteredFs.wrap(fs, delegate.toShaPath());
   }
 }

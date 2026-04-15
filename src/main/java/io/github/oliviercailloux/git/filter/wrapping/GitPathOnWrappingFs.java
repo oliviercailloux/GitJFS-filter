@@ -2,11 +2,16 @@ package io.github.oliviercailloux.git.filter.wrapping;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
+import io.github.oliviercailloux.gitjfs.Commit;
 import io.github.oliviercailloux.gitjfs.ForwardingGitPath;
 import io.github.oliviercailloux.gitjfs.GitPath;
+import io.github.oliviercailloux.gitjfs.GitPathRootSha;
+import io.github.oliviercailloux.gitjfs.GitPathSha;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchEvent.Modifier;
@@ -149,5 +154,26 @@ public class GitPathOnWrappingFs implements GitPath {
   @Override
   public int compareTo(Path other) {
     return delegate.compareTo(GitWrappingFsProvider.delegateOrOriginal(other));
+  }
+
+  @Override
+  public ImmutableList<GitPathSha> getParentShas() throws IOException, NoSuchFileException {
+    return delegate.getParentShas().stream().map(p -> getFileSystem().wrap(p)).collect(ImmutableList.toImmutableList());
+  }
+
+  @Override
+  public GitPathSha toShaPath() throws IOException, NoSuchFileException {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'toShaPath'");
+  }
+
+  @Override
+  public Commit getCommit() throws IOException, NoSuchFileException {
+    return delegate().getCommit();
+  }
+
+  @Override
+  public ImmutableList<GitPathRootSha> getParentCommits() throws IOException, NoSuchFileException {
+    return delegate().getParentCommits().stream().map(p -> getFileSystem().wrap(p)).collect(ImmutableList.toImmutableList());
   }
 }

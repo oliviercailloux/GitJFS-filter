@@ -9,10 +9,12 @@ import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import io.github.oliviercailloux.gitjfs.GitFileSystem;
 import io.github.oliviercailloux.gitjfs.GitPath;
+import io.github.oliviercailloux.gitjfs.GitPathRef;
 import io.github.oliviercailloux.gitjfs.GitPathRoot;
 import io.github.oliviercailloux.gitjfs.GitPathRootRef;
 import io.github.oliviercailloux.gitjfs.GitPathRootSha;
 import io.github.oliviercailloux.gitjfs.GitPathRootShaCached;
+import io.github.oliviercailloux.gitjfs.GitPathSha;
 import io.github.oliviercailloux.jaris.exceptions.CheckedStream;
 import io.github.oliviercailloux.jaris.graphs.GraphUtils;
 import java.io.IOException;
@@ -64,6 +66,14 @@ public class GitWrappingFs extends GitFileSystem {
   protected GitPathOnWrappingFs wrap(GitPath path) {
     checkArgument(!path.getFileSystem().equals(this));
     return GitPathOnWrappingFs.wrap(this, path);
+  }
+  protected GitPathShaOnWrappingFs wrap(GitPathSha path) {
+    checkArgument(!path.getFileSystem().equals(this));
+    return new GitPathShaOnWrappingFs(this, path);
+  }
+  protected GitPathRefOnWrappingFs wrap(GitPathRef path) {
+    checkArgument(!path.getFileSystem().equals(this));
+    return new GitPathRefOnWrappingFs(this, path);
   }
 
   protected GitPathRootOnWrappingFs wrap(GitPathRoot path) {
@@ -124,17 +134,27 @@ public class GitWrappingFs extends GitFileSystem {
   }
 
   @Override
+  public GitPathRef getPathRootedRef(String rootStringForm, String... more) throws InvalidPathException {
+    return wrap(delegateIfOpen().getPathRootedRef(rootStringForm, more));
+  }
+
+  @Override
   public GitPath getAbsolutePath(String first, String... more) throws InvalidPathException {
     return wrap(delegateIfOpen().getAbsolutePath(first, more));
   }
 
   @Override
-  public GitPath getAbsolutePath(ObjectId commitId, String internalPath1, String... internalPath) {
-    return wrap(delegateIfOpen().getAbsolutePath(commitId, internalPath1, internalPath));
+  public GitPathSha getAbsolutePath(ObjectId commitId, String... internalPath) {
+    return wrap(delegateIfOpen().getAbsolutePath(commitId, internalPath));
   }
 
   @Override
-  public GitPath getRelativePath(String... names) throws InvalidPathException {
+  public GitPathSha getPath(ObjectId commitId, String... internalPath) {
+    return wrap(delegateIfOpen().getPath(commitId, internalPath));
+  }
+
+  @Override
+  public GitPathRef getRelativePath(String... names) throws InvalidPathException {
     return wrap(delegateIfOpen().getRelativePath(names));
   }
 

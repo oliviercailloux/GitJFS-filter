@@ -10,7 +10,9 @@ import io.github.oliviercailloux.gitjfs.ForwardingGitPathRootSha;
 import io.github.oliviercailloux.gitjfs.GitPath;
 import io.github.oliviercailloux.gitjfs.GitPathRootSha;
 import io.github.oliviercailloux.gitjfs.GitPathRootShaCached;
+import io.github.oliviercailloux.gitjfs.GitPathSha;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -167,5 +169,21 @@ final class GitPathRootShaOnFilteredFs extends ForwardingGitPathRootSha
   @Override
   public ImmutableList<GitPathRootSha> getParentCommits() throws IOException, NoSuchFileException {
     return ImmutableList.copyOf(fs.graph().predecessors(toShaCached()));
+  }
+
+  @Override
+  public ImmutableList<GitPathSha> getParentShas() throws IOException, NoSuchFileException {
+    return delegate.getParentShas().stream().filter(p -> {
+      try {
+        return fs.visible(p.getCommit());
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+    }).map(p -> GitPathShaOnFilteredFs.wrap(fs, p)).collect(ImmutableList.toImmutableList());
+  }
+
+  @Override
+  public GitPathSha toShaPath() throws IOException, NoSuchFileException {
+    return GitPathShaOnFilteredFs.wrap(fs, delegate.toShaPath());
   }
 }

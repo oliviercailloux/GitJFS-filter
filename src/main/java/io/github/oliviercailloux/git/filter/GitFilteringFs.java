@@ -14,10 +14,12 @@ import io.github.oliviercailloux.gitjfs.Commit;
 import io.github.oliviercailloux.gitjfs.ForwardingGitFileSystem;
 import io.github.oliviercailloux.gitjfs.GitFileSystem;
 import io.github.oliviercailloux.gitjfs.GitPath;
+import io.github.oliviercailloux.gitjfs.GitPathRef;
 import io.github.oliviercailloux.gitjfs.GitPathRoot;
 import io.github.oliviercailloux.gitjfs.GitPathRootRef;
 import io.github.oliviercailloux.gitjfs.GitPathRootSha;
 import io.github.oliviercailloux.gitjfs.GitPathRootShaCached;
+import io.github.oliviercailloux.gitjfs.GitPathSha;
 import io.github.oliviercailloux.jaris.exceptions.CheckedStream;
 import io.github.oliviercailloux.jaris.graphs.GraphUtils;
 import io.github.oliviercailloux.jaris.throwing.TPredicate;
@@ -102,14 +104,14 @@ public class GitFilteringFs extends ForwardingGitFileSystem {
   }
 
   @Override
-  public GitPath getAbsolutePath(ObjectId commitId, String internalPath1, String... internalPath) {
-    return GitPathOnFilteredFs.wrap(this,
-        super.getAbsolutePath(commitId, internalPath1, internalPath));
+  public GitPathSha getAbsolutePath(ObjectId commitId, String... internalPath) {
+    return GitPathShaOnFilteredFs.wrap(this,
+        super.getAbsolutePath(commitId, internalPath));
   }
 
   @Override
-  public GitPath getRelativePath(String... names) throws InvalidPathException {
-    return GitPathOnFilteredFs.wrap(this, super.getRelativePath(names));
+  public GitPathRef getRelativePath(String... names) throws InvalidPathException {
+    return GitPathRefOnFilteredFs.wrap(this, super.getRelativePath(names));
   }
 
   boolean computedGraph() {

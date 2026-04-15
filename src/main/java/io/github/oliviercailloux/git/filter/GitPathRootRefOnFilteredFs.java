@@ -3,13 +3,17 @@ package io.github.oliviercailloux.git.filter;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Verify.verify;
 
+import com.google.common.collect.ImmutableList;
 import io.github.oliviercailloux.gitjfs.ForwardingGitPath;
 import io.github.oliviercailloux.gitjfs.ForwardingGitPathRootRef;
 import io.github.oliviercailloux.gitjfs.GitPath;
 import io.github.oliviercailloux.gitjfs.GitPathRoot;
 import io.github.oliviercailloux.gitjfs.GitPathRootRef;
+import io.github.oliviercailloux.gitjfs.GitPathSha;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Objects;
 
@@ -114,5 +118,21 @@ final class GitPathRootRefOnFilteredFs extends ForwardingGitPathRootRef
   @Override
   public GitPath toRealPath(LinkOption... options) throws IOException {
     return GitPathOnFilteredFs.wrap(fs, delegate.toRealPath(options));
+  }
+
+  @Override
+  public ImmutableList<GitPathSha> getParentShas() throws IOException, NoSuchFileException {
+    return delegate.getParentShas().stream().filter(p -> {
+      try {
+        return fs.visible(p.getCommit());
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+    }).map(p -> GitPathShaOnFilteredFs.wrap(fs, p)).collect(ImmutableList.toImmutableList());
+  }
+
+  @Override
+  public GitPathSha toShaPath() throws IOException, NoSuchFileException {
+    return GitPathShaOnFilteredFs.wrap(fs, delegate.toShaPath());
   }
 }
