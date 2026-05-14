@@ -27,31 +27,31 @@ public record CommitDates (ZonedDateTime authorDate, ZonedDateTime committerDate
   /**
    * Returns a new instance of {@code CommitDates} with the specified author and committer dates.
    *
-   * @param authorDate the date when the commit was authored
-   * @param committerDate the date when the commit was committed
+   * @param authorDate the date when the commit was authored, null for none
+   * @param committerDate the date when the commit was committed, null for none
    * @return a new {@code CommitDates} instance
    */
   public static CommitDates given(ZonedDateTime authorDate, ZonedDateTime committerDate) {
-    return new CommitDates(checkNotNull(authorDate), checkNotNull(committerDate));
+    return new CommitDates(authorDate, committerDate);
   }
 
   /**
    * Returns a new instance of {@code CommitDates} with the specified author date. *
    *
-   * @param authorDate the date when the commit was authored
+   * @param authorDate the date when the commit was authored, null for none
    * @return a new {@code CommitDates} instance with the specified author date and no committer date
    */
   public static CommitDates givenAuthorDate(ZonedDateTime authorDate) {
-    return new CommitDates(checkNotNull(authorDate), null);
+    return new CommitDates(authorDate, null);
   }
 
   /**
    * Returns a new instance of {@code CommitDates} with the specified committer date. *
    *
-   * @param committerDate the date when the commit was committed
+   * @param committerDate the date when the commit was committed, null for none
    * @return a new {@code CommitDates} instance with the specified committer date and no author date
    */
   public static CommitDates givenCommitterDate(ZonedDateTime committerDate) {
-    return new CommitDates(null, checkNotNull(committerDate));
+    return new CommitDates(null, committerDate);
   }
 }
