@@ -67,10 +67,12 @@ public class GitWrappingFs extends GitFileSystem {
     checkArgument(!path.getFileSystem().equals(this));
     return GitPathOnWrappingFs.wrap(this, path);
   }
+
   protected GitPathShaOnWrappingFs wrap(GitPathSha path) {
     checkArgument(!path.getFileSystem().equals(this));
     return new GitPathShaOnWrappingFs(this, path);
   }
+
   protected GitPathRefOnWrappingFs wrap(GitPathRef path) {
     checkArgument(!path.getFileSystem().equals(this));
     return new GitPathRefOnWrappingFs(this, path);
@@ -113,12 +115,6 @@ public class GitWrappingFs extends GitFileSystem {
   }
 
   @Override
-  public GitPath getPath(String first, String... more) throws InvalidPathException {
-    final GitFileSystem iDelegate = delegateIfOpen();
-    return wrap(iDelegate.getPath(first, more));
-  }
-
-  @Override
   public GitPathRoot getPathRoot(String rootStringForm) throws InvalidPathException {
     return wrap(delegateIfOpen().getPathRoot(rootStringForm));
   }
@@ -134,7 +130,8 @@ public class GitWrappingFs extends GitFileSystem {
   }
 
   @Override
-  public GitPathRef getPathRootedRef(String rootStringForm, String... more) throws InvalidPathException {
+  public GitPathRef getPathRootedRef(String rootStringForm, String... more)
+      throws InvalidPathException {
     return wrap(delegateIfOpen().getPathRootedRef(rootStringForm, more));
   }
 
@@ -146,6 +143,12 @@ public class GitWrappingFs extends GitFileSystem {
   @Override
   public GitPathSha getAbsolutePath(ObjectId commitId, String... internalPath) {
     return wrap(delegateIfOpen().getAbsolutePath(commitId, internalPath));
+  }
+
+  @Override
+  public GitPath getPath(String first, String... more) throws InvalidPathException {
+    final GitFileSystem iDelegate = delegateIfOpen();
+    return wrap(iDelegate.getPath(first, more));
   }
 
   @Override

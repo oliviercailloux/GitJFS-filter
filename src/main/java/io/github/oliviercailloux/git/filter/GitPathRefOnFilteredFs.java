@@ -2,7 +2,8 @@ package io.github.oliviercailloux.git.filter;
 
 import io.github.oliviercailloux.gitjfs.GitPathRef;
 
-final class GitPathRefOnFilteredFs extends GitPathOnFilteredFs implements GitPathRef, IGitPathOnFilteredFs {
+final class GitPathRefOnFilteredFs extends GitPathOnFilteredFs
+    implements GitPathRef, IGitPathOnFilteredFs {
 
   public static GitPathRefOnFilteredFs wrap(GitFilteringFs fs, GitPathRef delegate) {
     return new GitPathRefOnFilteredFs(fs, delegate);
@@ -21,5 +22,4 @@ final class GitPathRefOnFilteredFs extends GitPathOnFilteredFs implements GitPat
   public String getGitRef() {
     return delegate().getGitRef();
   }
-
 }

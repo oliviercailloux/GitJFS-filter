@@ -160,7 +160,8 @@ public class GitPathOnWrappingFs implements GitPath {
 
   @Override
   public ImmutableList<GitPathSha> getParentShas() throws IOException, NoSuchFileException {
-    return delegate.getParentShas().stream().map(p -> getFileSystem().wrap(p)).collect(ImmutableList.toImmutableList());
+    return delegate.getParentShas().stream().map(p -> getFileSystem().wrap(p))
+        .collect(ImmutableList.toImmutableList());
   }
 
   @Override
@@ -176,6 +177,7 @@ public class GitPathOnWrappingFs implements GitPath {
 
   @Override
   public ImmutableList<GitPathRootSha> getParentCommits() throws IOException, NoSuchFileException {
-    return delegate().getParentCommits().stream().map(p -> getFileSystem().wrap(p)).collect(ImmutableList.toImmutableList());
+    return delegate().getParentCommits().stream().map(p -> getFileSystem().wrap(p))
+        .collect(ImmutableList.toImmutableList());
   }
 }

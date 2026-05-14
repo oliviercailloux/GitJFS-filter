@@ -21,7 +21,8 @@ import org.eclipse.jgit.api.Git;
  * Similar to a GitPath (which it wraps and delegates to) except linked to a filteredFs.
  */
 @Deprecated
-sealed class GitPathOnFilteredFs extends ForwardingGitPath implements IGitPathOnFilteredFs permits GitPathShaOnFilteredFs, GitPathRefOnFilteredFs {
+sealed class GitPathOnFilteredFs extends ForwardingGitPath implements IGitPathOnFilteredFs
+    permits GitPathShaOnFilteredFs, GitPathRefOnFilteredFs {
 
   static GitPathOnFilteredFs wrap(GitFilteringFs fs, GitPath delegate) {
     return new GitPathOnFilteredFs(fs, delegate);

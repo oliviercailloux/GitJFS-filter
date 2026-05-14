@@ -18,6 +18,4 @@ public class GitPathRefOnWrappingFs extends GitPathOnWrappingFs implements GitPa
   public String getGitRef() {
     return delegate().getGitRef();
   }
-
-  
 }
