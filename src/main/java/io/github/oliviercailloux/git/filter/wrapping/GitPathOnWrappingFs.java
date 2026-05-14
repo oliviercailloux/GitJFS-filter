@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import io.github.oliviercailloux.gitjfs.Commit;
 import io.github.oliviercailloux.gitjfs.ForwardingGitPath;
 import io.github.oliviercailloux.gitjfs.GitPath;
+import io.github.oliviercailloux.gitjfs.GitPathRoot;
 import io.github.oliviercailloux.gitjfs.GitPathRootSha;
 import io.github.oliviercailloux.gitjfs.GitPathSha;
 import java.io.IOException;
@@ -56,7 +57,8 @@ public class GitPathOnWrappingFs implements GitPath {
 
   @Override
   public GitPathRootOnWrappingFs getRoot() {
-    return getFileSystem().wrap(delegate.getRoot());
+    GitPathRoot root = delegate.getRoot();
+    return root == null ? null : getFileSystem().wrap(root);
   }
 
   @Override
