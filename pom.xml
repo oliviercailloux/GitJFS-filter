@@ -23,7 +23,7 @@
     <dependency>
       <groupId>io.github.oliviercailloux.git</groupId>
       <artifactId>gitjfs</artifactId>
-      <version>0.0.10-SNAPSHOT</version>
+      <version>0.0.10</version>
     </dependency>
     <!-- For GitFilteringFs -->
     <dependency>
