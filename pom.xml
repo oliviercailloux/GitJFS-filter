@@ -9,7 +9,7 @@
   <name>GitJFS filter</name>
   <groupId>io.github.oliviercailloux.git</groupId>
   <artifactId>gitjfs-filter</artifactId>
-  <version>0.0.7</version>
+  <version>0.0.8-SNAPSHOT</version>
   <properties>
     <github-repository>GitJFS-filter</github-repository>
   </properties>
